@@ -1,26 +1,135 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * Sunpool — Warm Editorial.
+ * One neutral ramp (ink on paper) and one accent (terracotta).
+ * Measured contrast on paper #faf9f6:
+ *   ink #1a1714           16.95:1
+ *   muted ink #6b645c      5.54:1
+ *   accent text #c2410c    4.92:1  (small accent text)
+ *   terracotta #ea580c     3.38:1  (fills, large numbers, live dot only)
+ *   ink on terracotta      5.01:1  (primary button label)
+ */
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-geist);
+  --font-mono: var(--font-jetbrains-mono);
+  --font-heading: var(--font-fraunces);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-rule: var(--rule);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-chart-actual: var(--chart-actual);
+  --color-chart-forecast: var(--chart-forecast);
+  --color-chart-band: var(--chart-band);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+  --shadow-offset: 3px 3px 0 0 var(--offset-shadow);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* primitives */
+  --paper: #faf9f6;
+  --paper-sunk: #f2efe8;
+  --ink: #1a1714;
+  --ink-muted: #6b645c;
+  --terracotta: #ea580c;
+  --terracotta-deep: #c2410c;
+  --terracotta-wash: #fdeee4;
+
+  /* semantic roles */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--paper);
+  --card-foreground: var(--ink);
+  --popover: var(--paper);
+  --popover-foreground: var(--ink);
+  --primary: var(--terracotta);
+  --primary-foreground: var(--ink);
+  --secondary: var(--paper-sunk);
+  --secondary-foreground: var(--ink);
+  --muted: var(--paper-sunk);
+  --muted-foreground: var(--ink-muted);
+  --accent: var(--terracotta-wash);
+  --accent-foreground: var(--ink);
+  --accent-text: var(--terracotta-deep);
+  --destructive: #b42318;
+  --success: #2f6b3a;
+  --border: var(--ink);
+  --rule: color-mix(in oklab, var(--ink) 14%, transparent);
+  --input: var(--ink);
+  --ring: var(--ink);
+  --offset-shadow: color-mix(in oklab, var(--ink) 85%, transparent);
+  --chart-actual: var(--terracotta);
+  --chart-forecast: var(--ink);
+  --chart-band: color-mix(in oklab, var(--terracotta) 16%, transparent);
+  --radius: 0.375rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring;
+  }
+  html {
+    @apply font-sans;
+    scroll-padding-top: 1rem;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--terracotta-wash);
+    color: var(--ink);
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@utility font-display {
+  font-family: var(--font-fraunces);
+  font-optical-sizing: auto;
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility tag {
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
 }
