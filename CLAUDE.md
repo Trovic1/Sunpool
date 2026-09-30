@@ -126,3 +126,5 @@ Banned: indigo-to-purple gradients, glassmorphism everywhere, evenly sized card 
 - [ ] README with setup, architecture diagram, and track alignment
 - [ ] Demo video 3–5 minutes following `docs/DEMO_SCRIPT.md`
 - [ ] Devpost submitted before the deadline, with buffer
+
+@AGENTS.md
