@@ -101,6 +101,7 @@ Fast springs, no bounce. Purposeful only.
 ## Constraints
 
 - **Stack:** Next.js (App Router), TypeScript, Tailwind CSS v4, shadcn/ui on Radix UI, Lucide icons only, Framer Motion, Sonner, Nuqs (URL state for scenario and selected house), Recharts. wagmi + viem for Celo later.
+- **Setting:** the seeded neighborhood is in Lagos, Nigeria (about 6.5° N). Day curves use Lagos sunrise/sunset and irradiance, the CO₂ estimate uses a sourced Nigerian grid emission factor shown in the UI, and prices are quoted in cUSD.
 - **Data:** seeded, realistic data in `src/lib/seed.ts`: named houses with IDs, panel sizes in kW, daily curves, prices in cUSD. The seeded path stays available behind an env flag after real chain calls land.
 - **Honesty:** simulated data labeled in the UI and README; CO₂ shown as an estimate with its emission factor; forecasts shown with a confidence band.
 - **Responsive:** mobile-first. The buyer flow must work at 360px width (MiniPay). No horizontal scroll at 320px.
