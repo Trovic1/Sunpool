@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sunpool
 
-## Getting Started
+**Your neighbor's rooftop is your power plant. Sunpool makes the trade trustworthy.**
 
-First, run the development server:
+Neighborhood solar trading on Celo. Households with rooftop solar sell surplus kWh to nearby buyers, paid in cUSD. Every verified kWh batch mints a renewable energy certificate (REC), and a meter reading ID can be consumed only once, so certificates cannot be double counted. A transparent forecasting layer predicts generation, suggests a fair price and matches sellers to buyers.
+
+IEEE ClimateChain Global Hackathon 2026 · Track: Renewable Energy & Energy Trading.
+
+> **Meter data in this demo is simulated.** The seeded neighborhood is Surulere, Lagos, Nigeria. In production, readings are signed by certified smart meters or inverter APIs before a certificate is minted.
+
+## Status
+
+| Piece | State |
+| --- | --- |
+| Market screen (seeded): trade tape, generation + forecast chart, counters, listings, list surplus | Done |
+| My Home, Certificate Ledger, Double-claim demo, About / Impact | Planned |
+| Contracts (`ReadingRegistry`, `RECToken`, `EnergyMarket`) + tests | Planned |
+| Wallet + real cUSD settlement on Celo testnet | Planned |
+
+## Run it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Demo states are URL-driven so every state can be shown on camera:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `/?state=live` (default): simulated clock, trades stream into the tape
+- `/?state=empty`: pre-dawn, no trades yet
+- `/?state=error`: trade feed offline, with retry
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Checks: `npm run lint`, `npx tsc --noEmit`, `npm run build`.
 
-## Learn More
+## How the numbers are made
 
-To learn more about Next.js, take a look at the following resources:
+- **Seed data** (`src/lib/seed.ts`): 14 named households, 8 with rooftop arrays (2.8–8.4 kW). Deterministic PRNG, so every run looks the same.
+- **Solar curve:** half-sine between Lagos sunrise and sunset (06:45–18:45 WAT, early October), scaled to a specific yield of 5.0 kWh/kWp/day (Lagos is typically 4.5–5.4).
+- **Forecast** (`src/lib/forecast.ts`): clear-sky curve × forecast weather factor, corrected by an exponentially smoothed (α = 0.3) ratio of metered to forecast output. The confidence band widens with the horizon. No ML dependency.
+- **Price suggestion:** median of the last 20 trades, adjusted up to ±5% for next-hour supply vs buyer demand.
+- **Estimated CO₂ avoided:** traded kWh × 0.456 kg CO₂e/kWh (Nigeria grid 2025, lifecycle, [Ember via Our World in Data](https://ourworldindata.org/grapher/carbon-intensity-electricity)). This is an estimate; it assumes each traded kWh displaces an average grid kWh.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Next.js (App Router) · TypeScript · Tailwind CSS v4 · shadcn/ui (Radix) · Lucide · Framer Motion · Sonner · Nuqs · Recharts · wagmi + viem (Celo) · Hardhat + OpenZeppelin.
 
-## Deploy on Vercel
+## Docs
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [`docs/PRD.md`](docs/PRD.md): design PRD and Warm Editorial brand
+- [`docs/SUBMISSION.md`](docs/SUBMISSION.md): running Devpost write-up
