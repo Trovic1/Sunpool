@@ -3,7 +3,7 @@ import "server-only"
 import { createPublicClient, formatUnits, http, parseAbiItem, type Address, type Hex } from "viem"
 import { celoSepolia } from "viem/chains"
 
-import { CELO_SEPOLIA } from "./celo"
+import { CELO_SEPOLIA, SETTLEMENT_TOKEN } from "./celo"
 import { SUNPOOL_CONTRACTS, energyMarketAbi } from "./contracts"
 
 export const publicClient = createPublicClient({
@@ -91,8 +91,8 @@ async function scanTrades(head: bigint) {
         buyer: a.buyer!,
         readingId: a.readingId!,
         wh: Number(a.wh!),
-        price: Number(formatUnits(a.pricePerKwh!, CELO_SEPOLIA.stablecoin.decimals)),
-        total: Number(formatUnits(a.total!, CELO_SEPOLIA.stablecoin.decimals)),
+        price: Number(formatUnits(a.pricePerKwh!, SETTLEMENT_TOKEN.decimals)),
+        total: Number(formatUnits(a.total!, SETTLEMENT_TOKEN.decimals)),
         certificateId: a.certificateId!.toString(),
         txHash: log.transactionHash!,
         blockNumber: log.blockNumber!.toString(),
@@ -129,7 +129,7 @@ async function readListings(): Promise<ChainListing[]> {
       id: id.toString(),
       seller: l.seller,
       wh: Number(l.wh),
-      price: Number(formatUnits(l.pricePerKwh, CELO_SEPOLIA.stablecoin.decimals)),
+      price: Number(formatUnits(l.pricePerKwh, SETTLEMENT_TOKEN.decimals)),
       priceWei: l.pricePerKwh.toString(),
       listedAt: Number(l.listedAt),
       readingId: l.reading.readingId,

@@ -20,7 +20,25 @@ export const CELO_SEPOLIA = {
     name: "Mento Dollar",
     decimals: 18,
   },
+  /**
+   * Circle USDC on Celo Sepolia (symbol "USDC", 6 decimals, verified on-chain).
+   * Free from https://faucet.circle.com (choose Celo Sepolia).
+   */
+  usdc: {
+    address: "0x01C5C0122039549AD1493B8220cABEdD739BC44E",
+    symbol: "USDC",
+    name: "USD Coin",
+    decimals: 6,
+  },
+  circleFaucetUrl: "https://faucet.circle.com",
 } as const
+
+/**
+ * Token the testnet market settles in. USDC, because test USDm has almost no
+ * liquidity on Celo Sepolia (the Mento USDC/USDm pool held 0.0014 USDm on 2026-10-01).
+ * Mainnet would settle in USDm (formerly cUSD), which MiniPay also supports.
+ */
+export const SETTLEMENT_TOKEN = CELO_SEPOLIA.usdc
 
 export const CELO_MAINNET = {
   id: 42220,
