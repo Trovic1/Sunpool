@@ -57,11 +57,11 @@ Pitch framing: first customers are **estates, compounds and mini-grid operators*
 
 ## 4. Build list for the next sessions (in priority order)
 
-1. **About / Impact page**: track alignment, the five user stories above, the production path, honest notes. Judges read this.
+1. ✅ **About / Impact page** (done 2026-10-01, `/about`): track alignment, the five user stories above, the production path, honest notes. Judges read this.
 2. **Certificate Ledger page**: every certificate with meter ID, reading ID, Wh, owner and an explorer link; reading IDs marked "consumed".
 3. **My Home page**: the connected wallet's listings, purchases and certificates; generation vs consumption; the price suggestion with its reasoning; cancel a listing.
 4. **AI layer as a route handler** (per CLAUDE.md): `/api/forecast` and `/api/match` returning the forecast, price suggestion and a seller-to-buyer match, so the model is visible and testable.
-5. **Polish found while testing**: names truncate in the trade tape ("Sunpool de…", "Y…"); the `?state=` parameter should be ignored or cleaned in on-chain mode; mobile and MiniPay test.
+5. **Polish found while testing**: ✅ tape names wrap; ✅ `?state=` dropped on the on-chain market; still to do: mobile and MiniPay test.
 6. **Docs**: `docs/ARCHITECTURE.md` with a diagram, `docs/DEMO_SCRIPT.md`, finish `docs/SUBMISSION.md` (scalability and adoption section).
 7. **Design pass** (last, as agreed).
 
