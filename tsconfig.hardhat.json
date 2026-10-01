@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "node16",
+    "moduleResolution": "node16",
+    "lib": ["ES2023"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["hardhat.config.ts", "ignition/**/*.ts", "test/**/*.ts", "scripts/**/*.ts", "types/**/*.ts", "artifacts/**/*.d.ts"]
+}
