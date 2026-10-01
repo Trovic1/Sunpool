@@ -51,6 +51,12 @@ export function explainError(error: unknown): ExplainedError {
       if (name) return { title: `Rejected by the contract: ${name}`, description: "Nothing was charged." }
     }
     const text = `${error.shortMessage} ${error.details ?? ""}`.toLowerCase()
+    if (text.includes("nonce too low")) {
+      return {
+        title: "Your wallet was a step behind the network",
+        description: "Nothing was charged. Press the button again; any approval you gave is already saved.",
+      }
+    }
     if (text.includes("exceeds balance")) return CUSTOM_ERRORS.ERC20InsufficientBalance
     if (text.includes("exceeds allowance")) return CUSTOM_ERRORS.ERC20InsufficientAllowance
     if (text.includes("insufficient funds")) {
