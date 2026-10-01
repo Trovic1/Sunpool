@@ -9,7 +9,7 @@ export function SiteFooter() {
       <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-sm text-muted-foreground sm:px-6">
         <p className="text-pretty">
           <strong className="font-medium text-foreground">Meter data is simulated.</strong> A server-side
-          meter key signs each reading. Listings, USDm payments and certificates are real transactions on
+          meter key signs each reading. Listings, USDC payments and certificates are real transactions on
           the Celo Sepolia testnet. In production, certified smart meters or inverter APIs sign readings
           on the device.
         </p>

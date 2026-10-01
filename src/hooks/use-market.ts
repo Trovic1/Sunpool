@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { toast } from "sonner"
 
 import { buildGenerationSeries, suggestPrice } from "@/lib/forecast"
-import { formatCusd, formatKwh, formatPrice } from "@/lib/format"
+import { CURRENCY, formatCusd, formatKwh, formatPrice } from "@/lib/format"
 import {
   DEMO_BUYER,
   DEMO_SELLER,
@@ -100,7 +100,7 @@ export function useMarket(): MarketModel {
       const seller = houseById(trade.sellerId)?.name
       const buyer = houseById(trade.buyerId)?.name
       setAnnouncement(
-        `New trade: ${formatKwh(trade.kwh)} kWh from ${seller} to ${buyer} at ${formatPrice(trade.price)} USDm per kWh.`,
+        `New trade: ${formatKwh(trade.kwh)} kWh from ${seller} to ${buyer} at ${formatPrice(trade.price)} ${CURRENCY} per kWh.`,
       )
     }, TRADE_INTERVAL_MS)
     return () => window.clearInterval(timer)
@@ -147,7 +147,7 @@ export function useMarket(): MarketModel {
           prev.map((t) => (t.id === pendingTrade.id ? { ...t, status: "settled" } : t)),
         )
         toast.success(`Bought ${formatKwh(listing.kwh)} kWh from ${seller}`, {
-          description: `${formatCusd(listing.kwh * listing.price)} USDm at ${formatPrice(listing.price)} USDm/kWh. Certificate minted for reading ${listing.readingId} (simulated).`,
+          description: `${formatCusd(listing.kwh * listing.price)} ${CURRENCY} at ${formatPrice(listing.price)} ${CURRENCY}/kWh. Certificate minted for reading ${listing.readingId} (simulated).`,
         })
         setAnnouncement(`Purchase settled: ${formatKwh(listing.kwh)} kWh from ${seller}.`)
       }, SETTLE_MS)
@@ -178,7 +178,7 @@ export function useMarket(): MarketModel {
             return
           }
           setListings((prev) => prev.map((l) => (l.id === listing.id ? { ...l, pending: false } : l)))
-          toast.success(`Listed ${formatKwh(kwh)} kWh at ${formatPrice(price)} USDm/kWh`, {
+          toast.success(`Listed ${formatKwh(kwh)} kWh at ${formatPrice(price)} ${CURRENCY}/kWh`, {
             description: `Visible to buyers in ${NEIGHBORHOOD.name} now.`,
           })
           resolve()

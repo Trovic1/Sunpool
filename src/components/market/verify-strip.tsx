@@ -14,8 +14,8 @@ const STEPS = [
   },
   {
     icon: ReceiptText,
-    title: "Certificate minted, USDm settles",
-    body: "The buyer pays the seller in USDm and receives a renewable energy certificate for exactly those kWh.",
+    title: "Certificate minted, payment settles",
+    body: "The buyer pays the seller in a dollar stablecoin and receives a renewable energy certificate for exactly those kWh.",
   },
 ] as const
 
