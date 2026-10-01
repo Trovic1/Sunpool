@@ -1,7 +1,7 @@
 import { keccak256, stringToHex, type Address } from "viem"
 
 import { energyMarketAbi, readingRegistryAbi, recTokenAbi } from "./abis"
-import { CELO_SEPOLIA } from "./celo"
+import { CELO_SEPOLIA, SETTLEMENT_TOKEN } from "./celo"
 
 /**
  * Sunpool contracts on Celo Sepolia. Deployed 2026-10-01 with Hardhat Ignition
@@ -13,11 +13,12 @@ export const SUNPOOL_CONTRACTS = {
   readingRegistry: (process.env.NEXT_PUBLIC_READING_REGISTRY_ADDRESS ??
     "0xdA4575C3C30F5E81E0d57Ed96fd6ba39a2FE8b10") as Address,
   recToken: (process.env.NEXT_PUBLIC_REC_TOKEN_ADDRESS ?? "0xC92552b83C094E8052d9b8B4EDba34A3E1bA4ec6") as Address,
+  /** USDC-settled market. The first market (USDm, 0xEc37879a…f602) is paused. */
   energyMarket: (process.env.NEXT_PUBLIC_ENERGY_MARKET_ADDRESS ??
-    "0xEc37879ac09BE6C49539de1B3CE29eb9f220f602") as Address,
-  stablecoin: CELO_SEPOLIA.stablecoin.address as Address,
-  /** First block to scan for events. */
-  deployBlock: BigInt(process.env.NEXT_PUBLIC_DEPLOY_BLOCK ?? 37_565_255),
+    "0xAd7dF1530410e4eA9a6CAcb0C9C993958Aef0A29") as Address,
+  stablecoin: SETTLEMENT_TOKEN.address as Address,
+  /** First block to scan for events (USDC market deployment). */
+  deployBlock: BigInt(process.env.NEXT_PUBLIC_DEPLOY_BLOCK ?? 37_567_991),
 } as const
 
 /** Wallets with a public role in the demo, shown by name instead of a raw address. */
