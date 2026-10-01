@@ -1,5 +1,5 @@
 {
-  "note": "A reading already consumed on Celo Sepolia. The double-claim page replays it to show the rejection.",
+  "note": "A reading already consumed on Celo Sepolia (first claimed on the original market). The registry is shared, so every market rejects it.",
   "reading": {
     "readingId": "0x694a227832a66c627a80916f571093280a88fd01a2f45ad66dbef4a33c277c7f",
     "meterId": "0xa054cfecf4d95d22bc1434f0b6a7e4ff234787e734990f9f1274c3651539fd93",
@@ -8,6 +8,5 @@
     "wh": "1200"
   },
   "signature": "0xf79317b96eab61d1675f9cfc2d09c3dd981cc6b839a4610b045a4041cc54a7b91c941dcaf405f4f01e4cf021173fbad6b774f237268f370fcdd23c16f35d3dbe1b",
-  "firstClaimTx": "0xab573ae4a3e9e2d0dfcdbc93375fb3e2c59625855925968dfa75f88555df8b88",
-  "pricePerKwh": "125000000000000000"
+  "firstClaimTx": "0xab573ae4a3e9e2d0dfcdbc93375fb3e2c59625855925968dfa75f88555df8b88"
 }

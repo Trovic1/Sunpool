@@ -1,6 +1,6 @@
 import { BaseError, ContractFunctionRevertedError, UserRejectedRequestError } from "viem"
 
-import { CELO_SEPOLIA } from "./celo"
+import { CELO_SEPOLIA, SETTLEMENT_TOKEN } from "./celo"
 
 export type ExplainedError = { title: string; description: string; cancelled?: boolean }
 
@@ -32,8 +32,8 @@ const CUSTOM_ERRORS: Record<string, ExplainedError> = {
     description: "Approve the full amount in your wallet, then buy again.",
   },
   ERC20InsufficientBalance: {
-    title: "Not enough USDm",
-    description: "Swap some test CELO for USDm at app.mento.org, then try again.",
+    title: `Not enough ${SETTLEMENT_TOKEN.symbol}`,
+    description: `Get free test ${SETTLEMENT_TOKEN.symbol} at faucet.circle.com (Celo Sepolia), then try again.`,
   },
   EnforcedPause: { title: "The market is paused", description: "Trading resumes when the operator unpauses it." },
 }
@@ -51,6 +51,8 @@ export function explainError(error: unknown): ExplainedError {
       if (name) return { title: `Rejected by the contract: ${name}`, description: "Nothing was charged." }
     }
     const text = `${error.shortMessage} ${error.details ?? ""}`.toLowerCase()
+    if (text.includes("exceeds balance")) return CUSTOM_ERRORS.ERC20InsufficientBalance
+    if (text.includes("exceeds allowance")) return CUSTOM_ERRORS.ERC20InsufficientAllowance
     if (text.includes("insufficient funds")) {
       return {
         title: "Not enough CELO for gas",

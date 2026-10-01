@@ -5,7 +5,7 @@
  *   src/lib/chain/double-claim-fixture.json (public data: the reading and its signature)
  *
  * Meter readings are simulated: the registered meter key signs them here.
- * Run: node --env-file=.env.local scripts/seed-chain.ts
+ * Run: node --env-file=.env.local scripts/seed-chain.ts [--fixture]
  */
 import { randomBytes } from "node:crypto"
 import { writeFileSync } from "node:fs"
@@ -15,9 +15,9 @@ import { privateKeyToAccount } from "viem/accounts"
 import { celoSepolia } from "viem/chains"
 
 import { energyMarketAbi } from "../src/lib/chain/abis.ts"
-import { CELO_SEPOLIA } from "../src/lib/chain/celo.ts"
+import { CELO_SEPOLIA, SETTLEMENT_TOKEN } from "../src/lib/chain/celo.ts"
 
-const MARKET = "0xEc37879ac09BE6C49539de1B3CE29eb9f220f602"
+const MARKET = "0xAd7dF1530410e4eA9a6CAcb0C9C993958Aef0A29" // USDC market
 const REGISTRY = "0xdA4575C3C30F5E81E0d57Ed96fd6ba39a2FE8b10"
 const METER_ID = keccak256(new TextEncoder().encode("sunpool:demo-meter"))
 
@@ -56,13 +56,15 @@ async function list(wh: bigint, price: string) {
     address: MARKET,
     abi: energyMarketAbi,
     functionName: "list",
-    args: [reading, signature, parseUnits(price, 18)],
+    args: [reading, signature, parseUnits(price, SETTLEMENT_TOKEN.decimals)],
   })
   const receipt = await publicClient.waitForTransactionReceipt({ hash })
-  console.log(`listed ${Number(wh) / 1000} kWh at ${price} USDm/kWh: ${receipt.status} ${hash}`)
+  console.log(`listed ${Number(wh) / 1000} kWh at ${price} ${SETTLEMENT_TOKEN.symbol}/kWh: ${receipt.status} ${hash}`)
   return { reading, signature, hash }
 }
 
+// The double-claim fixture only needs creating once: the registry is shared by every market.
+if (process.argv.includes("--fixture")) {
 const fixture = await list(1_200n, "0.125")
 writeFileSync(
   "src/lib/chain/double-claim-fixture.json",
@@ -72,12 +74,12 @@ writeFileSync(
       reading: { ...fixture.reading, timestamp: fixture.reading.timestamp.toString(), wh: fixture.reading.wh.toString() },
       signature: fixture.signature,
       firstClaimTx: fixture.hash,
-      pricePerKwh: parseUnits("0.125", 18).toString(),
     },
     null,
     2,
   ) + "\n",
 )
+}
 
 for (const [wh, price] of [
   [3_200n, "0.121"],
