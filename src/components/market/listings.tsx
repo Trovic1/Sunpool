@@ -16,7 +16,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import type { Market, MarketListing } from "@/hooks/use-market"
-import { formatCusd, formatKwh, formatPrice, minuteLabel, partyName } from "@/lib/format"
+import { CURRENCY, formatCusd, formatKwh, formatPrice, minuteLabel, partyName } from "@/lib/format"
 import { DEMO_SELLER, houseById } from "@/lib/seed"
 import { cn } from "@/lib/utils"
 
@@ -36,7 +36,7 @@ export function Listings({ market, onListSurplus }: { market: Market; onListSurp
             Each listing is backed by a meter reading that can be claimed once. The suggested fair
             price right now is{" "}
             <span className="font-mono text-foreground tabular">{formatPrice(suggestion.price)}</span>{" "}
-            USDm/kWh.
+            {CURRENCY}/kWh.
           </p>
         </div>
         <Button size="lg" onClick={onListSurplus}>
@@ -169,7 +169,7 @@ function ListingRow({
         </div>
         <div className="flex flex-col">
           <dt className="tag">Total</dt>
-          <dd className="font-mono tabular">{formatCusd(total)} USDm</dd>
+          <dd className="font-mono tabular">{formatCusd(total)} {CURRENCY}</dd>
         </div>
       </dl>
 
@@ -180,7 +180,7 @@ function ListingRow({
           disabled={listing.pending || own}
           aria-label={
             !listing.pending && !own
-              ? `Buy ${formatKwh(listing.kwh)} kWh from ${sellerName} for ${formatCusd(total)} USDm`
+              ? `Buy ${formatKwh(listing.kwh)} kWh from ${sellerName} for ${formatCusd(total)} ${CURRENCY}`
               : undefined
           }
           className="min-w-24"

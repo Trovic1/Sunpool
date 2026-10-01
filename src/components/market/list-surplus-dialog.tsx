@@ -25,7 +25,7 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import type { Market } from "@/hooks/use-market"
-import { formatKwh, formatPrice, minuteLabel, shortAddress } from "@/lib/format"
+import { CURRENCY, formatKwh, formatPrice, minuteLabel, shortAddress } from "@/lib/format"
 import { DEMO_SELLER, NEIGHBORHOOD, TOTAL_PANEL_KW } from "@/lib/seed"
 
 const PRICE_MIN = 0.05
@@ -121,7 +121,7 @@ function ListSurplusForm({
           : `Enter between 0.1 and ${formatKwh(available)} kWh.`
     }
     if (!Number.isFinite(priceValue) || priceValue < PRICE_MIN || priceValue > PRICE_MAX) {
-      next.price = `Enter a price between ${formatPrice(PRICE_MIN)} and ${formatPrice(PRICE_MAX)} USDm/kWh.`
+      next.price = `Enter a price between ${formatPrice(PRICE_MIN)} and ${formatPrice(PRICE_MAX)} ${CURRENCY}/kWh.`
     }
     setErrors(next)
     if (next.kwh) return kwhRef.current?.focus()
@@ -170,7 +170,7 @@ function ListSurplusForm({
         </Field>
 
         <Field data-invalid={errors.price ? true : undefined}>
-          <FieldLabel htmlFor={`${id}-price`}>Price (USDm per kWh)</FieldLabel>
+          <FieldLabel htmlFor={`${id}-price`}>Price ({CURRENCY} per kWh)</FieldLabel>
           <Input
             ref={priceRef}
             id={`${id}-price`}
@@ -191,7 +191,7 @@ function ListSurplusForm({
               <span className="font-mono tabular">
                 {Number.isFinite(Number(kwh) * Number(price)) ? (Number(kwh) * Number(price)).toFixed(2) : "—"}
               </span>{" "}
-              USDm in total.
+              {CURRENCY} in total.
             </FieldDescription>
           )}
         </Field>
@@ -201,7 +201,7 @@ function ListSurplusForm({
         <p className="flex items-center gap-1.5 font-medium">
           <Sparkles aria-hidden className="size-4 text-accent-text" />
           Suggested price:{" "}
-          <span className="font-mono tabular">{formatPrice(suggestion.price)}</span> USDm/kWh
+          <span className="font-mono tabular">{formatPrice(suggestion.price)}</span> {CURRENCY}/kWh
         </p>
         <p className="text-muted-foreground">{suggestion.reason}</p>
         <Button

@@ -3,7 +3,7 @@
 import { ArrowUpRight } from "lucide-react"
 
 import { Skeleton } from "@/components/ui/skeleton"
-import { formatCusd, formatKwh } from "@/lib/format"
+import { CURRENCY, formatCusd, formatKwh } from "@/lib/format"
 import { EMISSION_FACTOR } from "@/lib/seed"
 import type { Market } from "@/hooks/use-market"
 
@@ -41,7 +41,7 @@ export function Counters({ market }: { market: Market }) {
           <Skeleton className="h-5 w-48" />
         ) : (
           <p className="text-sm text-muted-foreground">
-            <span className="font-mono tabular text-foreground">{formatCusd(totals.cusd)}</span> USDm{" "}
+            <span className="font-mono tabular text-foreground">{formatCusd(totals.cusd)}</span> {CURRENCY}{" "}
             {chain ? "settled on Celo Sepolia" : "settled between neighbors"}
           </p>
         )}
