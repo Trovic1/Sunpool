@@ -1,7 +1,7 @@
 "use client"
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
-import { ArrowRight, BadgeCheck, CloudOff, Pause, Play, RotateCw, Sunrise } from "lucide-react"
+import { ArrowRight, ArrowUpRight, BadgeCheck, CloudOff, Pause, Play, RotateCw, Sunrise } from "lucide-react"
 
 import { Alert, AlertAction, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
@@ -17,16 +17,19 @@ import {
 } from "@/components/ui/empty"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
-import { formatCusd, formatKwh, formatPrice, minuteLabel } from "@/lib/format"
-import { DEMO_BUYER, NEIGHBORHOOD, houseById, type Trade } from "@/lib/seed"
+import { explorerTx } from "@/lib/chain/contracts"
+import { formatCusd, formatKwh, formatPrice, minuteLabel, partyName } from "@/lib/format"
+import { DEMO_BUYER, HOUSES, NEIGHBORHOOD } from "@/lib/seed"
+import type { MarketTrade } from "@/hooks/market-types"
 import type { Market } from "@/hooks/use-market"
 import { cn } from "@/lib/utils"
 
 const VISIBLE_ROWS = 30
 
 export function TradeTape({ market, onListSurplus }: { market: Market; onListSurplus: () => void }) {
-  const { trades, status, scenario, paused, togglePaused, retry, announcement } = market
+  const { trades, status, scenario, paused, togglePaused, retry, announcement, mode } = market
   const isLive = scenario === "live" && status === "ready"
+  const chain = mode === "chain"
 
   return (
     <Card className="h-full min-h-0 gap-0 pb-0">
@@ -35,7 +38,9 @@ export function TradeTape({ market, onListSurplus }: { market: Market; onListSur
           <h2>Trade tape</h2>
           <LiveIndicator live={isLive && !paused} paused={isLive && paused} />
         </CardTitle>
-        <CardDescription>Settled trades in {NEIGHBORHOOD.name}, newest first.</CardDescription>
+        <CardDescription>
+          {chain ? "Settled on Celo Sepolia, newest first." : `Settled trades in ${NEIGHBORHOOD.name}, newest first.`}
+        </CardDescription>
         {isLive && (
           <CardAction>
             <Button variant="outline" size="sm" onClick={togglePaused} aria-pressed={paused}>
@@ -60,7 +65,9 @@ export function TradeTape({ market, onListSurplus }: { market: Market; onListSur
               <CloudOff />
               <AlertTitle>Trade feed unavailable</AlertTitle>
               <AlertDescription>
-                No updates since {minuteLabel(market.minute)} WAT. Check your connection, then retry.
+                {chain
+                  ? "Unable to reach Celo Sepolia. Check your connection, then retry."
+                  : `No updates since ${minuteLabel(market.minute)} WAT. Check your connection, then retry.`}
               </AlertDescription>
               <AlertAction>
                 <Button size="sm" variant="outline" onClick={retry} disabled={status === "reconnecting"}>
@@ -82,22 +89,25 @@ export function TradeTape({ market, onListSurplus }: { market: Market; onListSur
               <EmptyMedia variant="icon">
                 <Sunrise />
               </EmptyMedia>
-              <EmptyTitle className="font-display text-lg">No trades yet today</EmptyTitle>
+              <EmptyTitle className="font-display text-lg">
+                {chain ? "No trades settled yet" : "No trades yet today"}
+              </EmptyTitle>
               <EmptyDescription>
-                Rooftops start producing around {minuteLabel(NEIGHBORHOOD.sunriseMinutes)} WAT. You
-                can schedule a listing from the forecast now.
+                {chain
+                  ? "Every purchase on the market lands here with its transaction. List surplus or buy a listing to make the first one."
+                  : `Rooftops start producing around ${minuteLabel(NEIGHBORHOOD.sunriseMinutes)} WAT. You can schedule a listing from the forecast now.`}
               </EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
               <Button variant="outline" onClick={onListSurplus}>
-                Schedule a listing
+                {chain ? "List surplus" : "Schedule a listing"}
               </Button>
             </EmptyContent>
           </Empty>
         )}
 
         {status === "ready" && trades.length > 0 && (
-          <TapeList trades={trades.slice(0, VISIBLE_ROWS)} />
+          <TapeList trades={trades.slice(0, VISIBLE_ROWS)} account={market.account} />
         )}
       </CardContent>
     </Card>
@@ -120,7 +130,7 @@ function LiveIndicator({ live, paused }: { live: boolean; paused: boolean }) {
   )
 }
 
-function TapeList({ trades }: { trades: Trade[] }) {
+function TapeList({ trades, account }: { trades: MarketTrade[]; account?: string }) {
   const reduced = useReducedMotion()
   return (
     <div className="relative h-full">
@@ -149,7 +159,7 @@ function TapeList({ trades }: { trades: Trade[] }) {
               }}
               className="border-b border-rule last:border-b-0"
             >
-              <TradeRow trade={trade} />
+              <TradeRow trade={trade} account={account} />
             </motion.li>
           ))}
         </AnimatePresence>
@@ -162,24 +172,37 @@ function TapeList({ trades }: { trades: Trade[] }) {
   )
 }
 
-function TradeRow({ trade }: { trade: Trade }) {
-  const seller = houseById(trade.sellerId)
-  const buyer = houseById(trade.buyerId)
-  const mine = trade.buyerId === DEMO_BUYER.id
+const HOUSE_NAMES: Record<string, string> = Object.fromEntries(HOUSES.map((h) => [h.id, h.name]))
+
+function TradeRow({ trade, account }: { trade: MarketTrade; account?: string }) {
+  const seller = partyName(trade.sellerId, HOUSE_NAMES, account)
+  const buyer = trade.buyerId === DEMO_BUYER.id ? "You" : partyName(trade.buyerId, HOUSE_NAMES, account)
+  const mine = buyer === "You"
   const total = trade.kwh * trade.price
+  const readingLabel =
+    trade.readingId.length > 24 ? `${trade.readingId.slice(0, 10)}…${trade.readingId.slice(-6)}` : trade.readingId
 
   return (
     <article className="grid grid-cols-[3rem_1fr_auto] items-start gap-x-3 gap-y-0.5 px-4 py-2.5 text-sm">
-      <time className="pt-px font-mono text-xs text-muted-foreground tabular">{minuteLabel(trade.minute)}</time>
+      <time
+        className="pt-px font-mono text-xs text-muted-foreground tabular"
+        dateTime={trade.timestamp ? new Date(trade.timestamp * 1000).toISOString() : undefined}
+        title={trade.timestamp ? new Date(trade.timestamp * 1000).toLocaleString() : undefined}
+      >
+        {minuteLabel(trade.minute)}
+      </time>
 
       <div className="flex min-w-0 flex-col gap-0.5">
         <p className="flex min-w-0 items-center gap-1.5 font-medium">
-          <span className="truncate">{seller?.name}</span>
+          <span className="truncate">{seller}</span>
           <ArrowRight aria-hidden className="size-3.5 shrink-0 text-muted-foreground" />
           <span className="sr-only">sold to</span>
-          <span className={cn("truncate", mine && "text-accent-text")}>{buyer?.name}</span>
+          <span className={cn("truncate", mine && "text-accent-text")}>{buyer}</span>
         </p>
-        <p className="font-mono text-[0.6875rem] break-all text-muted-foreground">{trade.readingId}</p>
+        <p className="font-mono text-[0.6875rem] text-muted-foreground" title={trade.readingId}>
+          <span className="sr-only">Reading </span>
+          {readingLabel}
+        </p>
       </div>
 
       <div className="flex flex-col items-end gap-0.5">
@@ -188,7 +211,7 @@ function TradeRow({ trade }: { trade: Trade }) {
           <span className="text-muted-foreground"> kWh</span>
         </p>
         <p className="font-mono text-xs text-muted-foreground tabular">
-          {formatCusd(total)} cUSD <span className="hidden sm:inline">@ {formatPrice(trade.price)}</span>
+          {formatCusd(total)} USDm <span className="hidden sm:inline">@ {formatPrice(trade.price)}</span>
         </p>
         {trade.status === "pending" ? (
           <Badge variant="outline" className="mt-0.5">
@@ -201,9 +224,23 @@ function TradeRow({ trade }: { trade: Trade }) {
       </div>
 
       {trade.status === "settled" && (
-        <p className="col-start-2 flex items-center gap-1 text-xs text-muted-foreground">
-          <BadgeCheck aria-hidden className="size-3.5 text-success" />
-          REC minted
+        <p className="col-start-2 col-end-4 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <BadgeCheck aria-hidden className="size-3.5 text-success" />
+            REC {trade.certificateId ? `#${trade.certificateId}` : "minted"}
+          </span>
+          {trade.txHash && (
+            <a
+              href={explorerTx(trade.txHash)}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-0.5 underline decoration-dotted underline-offset-2 hover:text-foreground"
+            >
+              Transaction
+              <ArrowUpRight aria-hidden className="size-3" />
+              <span className="sr-only"> (opens Blockscout in a new tab)</span>
+            </a>
+          )}
         </p>
       )}
     </article>

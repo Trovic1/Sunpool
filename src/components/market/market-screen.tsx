@@ -4,6 +4,9 @@ import { motion, useReducedMotion, type Variants } from "framer-motion"
 import { useState } from "react"
 
 import { Badge } from "@/components/ui/badge"
+import type { MarketModel } from "@/hooks/market-types"
+import { useChainMarket } from "@/hooks/use-chain-market"
+import { useDataSource } from "@/hooks/use-data-source"
 import { useMarket } from "@/hooks/use-market"
 import { minuteLabel } from "@/lib/format"
 import { NEIGHBORHOOD } from "@/lib/seed"
@@ -17,7 +20,20 @@ import { TradeTape } from "./trade-tape"
 import { VerifyStrip } from "./verify-strip"
 
 export function MarketScreen() {
-  const market = useMarket()
+  const source = useDataSource()
+  return source === "chain" ? <ChainMarket /> : <SeededMarket />
+}
+
+function ChainMarket() {
+  return <MarketView market={useChainMarket()} />
+}
+
+function SeededMarket() {
+  return <MarketView market={useMarket()} />
+}
+
+function MarketView({ market }: { market: MarketModel }) {
+  const chain = market.mode === "chain"
   const [listOpen, setListOpen] = useState(false)
   const reduced = useReducedMotion()
 
@@ -48,14 +64,14 @@ export function MarketScreen() {
                 {minuteLabel(market.minute)} {NEIGHBORHOOD.timezone}
               </span>
               <Badge variant="outline" className="normal-case tracking-normal sm:hidden">
-                Simulated data
+                {chain ? "Celo Sepolia testnet" : "Simulated data"}
               </Badge>
             </p>
             <h1 className="font-display text-4xl leading-[1.05] font-medium tracking-tight sm:text-5xl">
               Your neighbor&rsquo;s rooftop is your power plant.
             </h1>
           </div>
-          <ScenarioSwitch market={market} />
+          {!chain && <ScenarioSwitch market={market} />}
         </motion.div>
 
         <div className="grid gap-4 lg:grid-cols-12">

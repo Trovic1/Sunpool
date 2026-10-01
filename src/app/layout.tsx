@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"
 import { Fraunces, Geist, JetBrains_Mono } from "next/font/google"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 
+import { Providers } from "@/components/providers"
 import { Toaster } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import "./globals.css"
@@ -25,7 +26,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Sunpool · Neighborhood solar trading",
   description:
-    "Households with rooftop solar sell surplus kWh to neighbors, settled in cUSD on Celo. Every verified kWh mints a certificate that can only be claimed once.",
+    "Households with rooftop solar sell surplus kWh to neighbors, settled in USDm (formerly cUSD) on Celo. Every verified kWh mints a certificate that can only be claimed once.",
 }
 
 export const viewport: Viewport = {
@@ -39,9 +40,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${fraunces.variable} ${geist.variable} ${jetbrainsMono.variable} antialiased`}
     >
       <body className="flex min-h-dvh flex-col">
-        <NuqsAdapter>
-          <TooltipProvider>{children}</TooltipProvider>
-        </NuqsAdapter>
+        <Providers>
+          <NuqsAdapter>
+            <TooltipProvider>{children}</TooltipProvider>
+          </NuqsAdapter>
+        </Providers>
         <Toaster position="bottom-right" />
       </body>
     </html>

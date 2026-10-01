@@ -20,22 +20,27 @@ import {
   makeTrade,
   seedListings,
   seedTrades,
-  type Listing,
   type Trade,
 } from "@/lib/seed"
 
-export const SCENARIOS = ["live", "empty", "error"] as const
-export type Scenario = (typeof SCENARIOS)[number]
+import {
+  SCENARIOS,
+  type FeedStatus,
+  type ListSurplusInput,
+  type MarketListing,
+  type MarketModel,
+  type Scenario,
+} from "./market-types"
 
-export type FeedStatus = "loading" | "ready" | "error" | "reconnecting"
-
-export type MarketListing = Listing & { pending?: boolean }
+export { SCENARIOS }
+export type { FeedStatus, MarketListing, Scenario }
+export type Market = MarketModel
 
 /** Simulated network latency for buys, listings and reconnects. */
 const LOAD_MS = 700
 const SETTLE_MS = 1100
 
-export function useMarket() {
+export function useMarket(): MarketModel {
   const [scenario, setScenario] = useQueryState(
     "state",
     parseAsStringLiteral(SCENARIOS).withDefault("live"),
@@ -95,7 +100,7 @@ export function useMarket() {
       const seller = houseById(trade.sellerId)?.name
       const buyer = houseById(trade.buyerId)?.name
       setAnnouncement(
-        `New trade: ${formatKwh(trade.kwh)} kWh from ${seller} to ${buyer} at ${formatPrice(trade.price)} cUSD per kWh.`,
+        `New trade: ${formatKwh(trade.kwh)} kWh from ${seller} to ${buyer} at ${formatPrice(trade.price)} USDm per kWh.`,
       )
     }, TRADE_INTERVAL_MS)
     return () => window.clearInterval(timer)
@@ -142,7 +147,7 @@ export function useMarket() {
           prev.map((t) => (t.id === pendingTrade.id ? { ...t, status: "settled" } : t)),
         )
         toast.success(`Bought ${formatKwh(listing.kwh)} kWh from ${seller}`, {
-          description: `${formatCusd(listing.kwh * listing.price)} cUSD at ${formatPrice(listing.price)} cUSD/kWh. Certificate minted for reading ${listing.readingId} (simulated).`,
+          description: `${formatCusd(listing.kwh * listing.price)} USDm at ${formatPrice(listing.price)} USDm/kWh. Certificate minted for reading ${listing.readingId} (simulated).`,
         })
         setAnnouncement(`Purchase settled: ${formatKwh(listing.kwh)} kWh from ${seller}.`)
       }, SETTLE_MS)
@@ -151,7 +156,7 @@ export function useMarket() {
   )
 
   const listSurplus = useCallback(
-    ({ kwh, price, untilMinute }: { kwh: number; price: number; untilMinute: number }) =>
+    ({ kwh, price, untilMinute }: ListSurplusInput) =>
       new Promise<void>((resolve, reject) => {
         const listing: MarketListing = {
           id: `L${indexRef.current++}`,
@@ -173,7 +178,7 @@ export function useMarket() {
             return
           }
           setListings((prev) => prev.map((l) => (l.id === listing.id ? { ...l, pending: false } : l)))
-          toast.success(`Listed ${formatKwh(kwh)} kWh at ${formatPrice(price)} cUSD/kWh`, {
+          toast.success(`Listed ${formatKwh(kwh)} kWh at ${formatPrice(price)} USDm/kWh`, {
             description: `Visible to buyers in ${NEIGHBORHOOD.name} now.`,
           })
           resolve()
@@ -221,6 +226,7 @@ export function useMarket() {
   const suggestion = useMemo(() => suggestPrice(settled, minute), [settled, minute])
 
   return {
+    mode: "seeded",
     scenario,
     changeScenario,
     status,
@@ -239,4 +245,3 @@ export function useMarket() {
   }
 }
 
-export type Market = ReturnType<typeof useMarket>

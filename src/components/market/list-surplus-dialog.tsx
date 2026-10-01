@@ -25,7 +25,7 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import type { Market } from "@/hooks/use-market"
-import { formatKwh, formatPrice, minuteLabel } from "@/lib/format"
+import { formatKwh, formatPrice, minuteLabel, shortAddress } from "@/lib/format"
 import { DEMO_SELLER, NEIGHBORHOOD, TOTAL_PANEL_KW } from "@/lib/seed"
 
 const PRICE_MIN = 0.05
@@ -37,7 +37,9 @@ export function availableSurplus(market: Market) {
   const start = Math.max(market.minute, NEIGHBORHOOD.sunriseMinutes)
   const hoursLeft = Math.max(0, (NEIGHBORHOOD.sunsetMinutes - start) / 60)
   const surplus = share * market.generation.remainingKwh - DEMO_SELLER.loadKw * hoursLeft * 0.6
-  return Math.max(0, Math.floor(surplus * 10) / 10)
+  // The simulated meter signs at most 10 kWh per reading (see /api/readings).
+  const cap = market.mode === "chain" ? 10 : Infinity
+  return Math.max(0, Math.min(cap, Math.floor(surplus * 10) / 10))
 }
 
 type Props = {
@@ -49,7 +51,12 @@ type Props = {
 export function ListSurplusDialog({ market, open, onOpenChange }: Props) {
   const desktop = useMediaQuery("(min-width: 640px)")
   const title = "List surplus"
-  const description = `Selling as ${DEMO_SELLER.name}, ${DEMO_SELLER.street} (${DEMO_SELLER.panelKw} kW rooftop, simulated).`
+  const description =
+    market.mode === "chain"
+      ? market.account
+        ? `Selling from ${shortAddress(market.account)} on Celo Sepolia. A simulated meter signs the reading; the listing is a real transaction.`
+        : "Your wallet will open to connect. A simulated meter signs the reading; the listing is a real transaction on Celo Sepolia."
+      : `Selling as ${DEMO_SELLER.name}, ${DEMO_SELLER.street} (${DEMO_SELLER.panelKw} kW rooftop, simulated).`
 
   if (desktop) {
     return (
@@ -114,7 +121,7 @@ function ListSurplusForm({
           : `Enter between 0.1 and ${formatKwh(available)} kWh.`
     }
     if (!Number.isFinite(priceValue) || priceValue < PRICE_MIN || priceValue > PRICE_MAX) {
-      next.price = `Enter a price between ${formatPrice(PRICE_MIN)} and ${formatPrice(PRICE_MAX)} cUSD/kWh.`
+      next.price = `Enter a price between ${formatPrice(PRICE_MIN)} and ${formatPrice(PRICE_MAX)} USDm/kWh.`
     }
     setErrors(next)
     if (next.kwh) return kwhRef.current?.focus()
@@ -163,7 +170,7 @@ function ListSurplusForm({
         </Field>
 
         <Field data-invalid={errors.price ? true : undefined}>
-          <FieldLabel htmlFor={`${id}-price`}>Price (cUSD per kWh)</FieldLabel>
+          <FieldLabel htmlFor={`${id}-price`}>Price (USDm per kWh)</FieldLabel>
           <Input
             ref={priceRef}
             id={`${id}-price`}
@@ -184,7 +191,7 @@ function ListSurplusForm({
               <span className="font-mono tabular">
                 {Number.isFinite(Number(kwh) * Number(price)) ? (Number(kwh) * Number(price)).toFixed(2) : "—"}
               </span>{" "}
-              cUSD in total.
+              USDm in total.
             </FieldDescription>
           )}
         </Field>
@@ -194,7 +201,7 @@ function ListSurplusForm({
         <p className="flex items-center gap-1.5 font-medium">
           <Sparkles aria-hidden className="size-4 text-accent-text" />
           Suggested price:{" "}
-          <span className="font-mono tabular">{formatPrice(suggestion.price)}</span> cUSD/kWh
+          <span className="font-mono tabular">{formatPrice(suggestion.price)}</span> USDm/kWh
         </p>
         <p className="text-muted-foreground">{suggestion.reason}</p>
         <Button
