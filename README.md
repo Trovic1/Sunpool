@@ -2,20 +2,58 @@
 
 **Your neighbor's rooftop is your power plant. Sunpool makes the trade trustworthy.**
 
-Neighborhood solar trading on Celo. Households with rooftop solar sell surplus kWh to nearby buyers, paid in cUSD. Every verified kWh batch mints a renewable energy certificate (REC), and a meter reading ID can be consumed only once, so certificates cannot be double counted. A transparent forecasting layer predicts generation, suggests a fair price and matches sellers to buyers.
+Neighborhood solar trading on Celo. Households with rooftop solar sell surplus kWh to nearby buyers, paid in USDm (Mento Dollar, formerly cUSD). Every verified kWh batch mints a renewable energy certificate (REC), and a meter reading ID can be consumed only once, so certificates cannot be double counted. A transparent forecasting layer predicts generation, suggests a fair price and matches sellers to buyers.
 
 IEEE ClimateChain Global Hackathon 2026 · Track: Renewable Energy & Energy Trading.
 
-> **Meter data in this demo is simulated.** The seeded neighborhood is Surulere, Lagos, Nigeria. In production, readings are signed by certified smart meters or inverter APIs before a certificate is minted.
+**Live demo:** https://sunpool-gamma.vercel.app · **Double-claim test:** https://sunpool-gamma.vercel.app/double-claim
+
+> **Meter data is simulated.** A server-side meter key signs each reading (`/api/readings`). Listings, USDm payments and certificates are real transactions on the Celo Sepolia testnet. In production, certified smart meters or inverter APIs sign readings on the device. The generation chart for Surulere, Lagos is modeled, not metered.
+
+## Deployed contracts (Celo Sepolia, chain ID 11142220)
+
+| Contract | Address |
+| --- | --- |
+| `ReadingRegistry` | [`0xdA4575C3C30F5E81E0d57Ed96fd6ba39a2FE8b10`](https://celo-sepolia.blockscout.com/address/0xdA4575C3C30F5E81E0d57Ed96fd6ba39a2FE8b10#code) |
+| `RECToken` (ERC-721) | [`0xC92552b83C094E8052d9b8B4EDba34A3E1bA4ec6`](https://celo-sepolia.blockscout.com/address/0xC92552b83C094E8052d9b8B4EDba34A3E1bA4ec6#code) |
+| `EnergyMarket` | [`0xEc37879ac09BE6C49539de1B3CE29eb9f220f602`](https://celo-sepolia.blockscout.com/address/0xEc37879ac09BE6C49539de1B3CE29eb9f220f602#code) |
+| USDm (Mento Dollar, settlement token) | [`0xdE9e4C3ce781b4bA68120d6261cbad65ce0aB00b`](https://celo-sepolia.blockscout.com/address/0xdE9e4C3ce781b4bA68120d6261cbad65ce0aB00b) |
+
+Source is verified on Blockscout. Network details live in `src/lib/chain/celo.ts` with their sources.
+
+## How it works
+
+```
+ simulated meter ──signs EIP-712 reading──▶ seller's wallet
+                                               │ list(reading, signature, price)
+                                               ▼
+                      ┌──────────────── EnergyMarket ────────────────┐
+                      │ consume(reading) ─▶ ReadingRegistry          │
+                      │   verifies meter signature, marks ID used    │
+                      │   (second claim ⇒ ReadingAlreadyConsumed)    │
+                      │ buy(listing) ─▶ USDm buyer ⇒ seller          │
+                      │             ─▶ RECToken.mint(buyer, data)    │
+                      └──────────────── emits TradeSettled ──────────┘
+                                               │
+                         /api/market indexes events ▶ live trade tape
+```
+
+## Try it
+
+1. Get test CELO for gas: https://faucet.celo.org/celo-sepolia
+2. Get test USDm: claim test USDC at https://faucet.circle.com (Celo Sepolia), then swap USDC → USDm at https://app.mento.org.
+3. Open the live demo, connect MetaMask or MiniPay, and buy a listing or list your own surplus.
+4. Open `/double-claim` and press "Claim it again" to watch the contract reject a reading that was already used. No wallet needed.
 
 ## Status
 
 | Piece | State |
 | --- | --- |
-| Market screen (seeded): trade tape, generation + forecast chart, counters, listings, list surplus | Done |
-| My Home, Certificate Ledger, Double-claim demo, About / Impact | Planned |
-| Contracts (`ReadingRegistry`, `RECToken`, `EnergyMarket`) + tests | Planned |
-| Wallet + real cUSD settlement on Celo testnet | Planned |
+| Contracts + 20 tests (double claim, signatures, settlement math, access control) | Done, deployed |
+| Market screen on Celo Sepolia: wallet, buy, list, live tape, counters | Done |
+| Double-claim test page (live contract) | Done |
+| Seeded offline demo (`?source=seeded`) | Done |
+| My Home, Certificate Ledger, About / Impact | Planned |
 
 ## Run it
 
@@ -24,13 +62,17 @@ npm install
 npm run dev        # http://localhost:3000
 ```
 
-Demo states are URL-driven so every state can be shown on camera:
+Copy `.env.example` to `.env.local`. `METER_SIGNER_PRIVATE_KEY` must be the key registered in `ReadingRegistry` for listing to work.
 
-- `/?state=live` (default): simulated clock, trades stream into the tape
-- `/?state=empty`: pre-dawn, no trades yet
-- `/?state=error`: trade feed offline, with retry
+The offline demo stays available at `/?source=seeded` (or `NEXT_PUBLIC_DATA_SOURCE=seeded`), with URL-driven states for recording:
 
-Checks: `npm run lint`, `npx tsc --noEmit`, `npm run build`.
+- `/?source=seeded&state=live`: simulated clock, trades stream into the tape
+- `/?source=seeded&state=empty`: pre-dawn, no trades yet
+- `/?source=seeded&state=error`: trade feed offline, with retry
+
+Checks: `npm run lint`, `npm run typecheck`, `npm run contracts:test`, `npm run build`.
+
+Contracts: `npm run contracts:test`, `npm run contracts:deploy` (needs `DEPLOYER_PRIVATE_KEY`), `npm run contracts:abis` after any contract change.
 
 ## How the numbers are made
 
@@ -42,7 +84,7 @@ Checks: `npm run lint`, `npx tsc --noEmit`, `npm run build`.
 
 ## Stack
 
-Next.js (App Router) · TypeScript · Tailwind CSS v4 · shadcn/ui (Radix) · Lucide · Framer Motion · Sonner · Nuqs · Recharts · wagmi + viem (Celo) · Hardhat + OpenZeppelin.
+Next.js (App Router) · TypeScript · Hardhat 3 + viem · OpenZeppelin 5 · Tailwind CSS v4 · shadcn/ui (Radix) · Lucide · Framer Motion · Sonner · Nuqs · Recharts · wagmi + viem (Celo Sepolia).
 
 ## Docs
 
