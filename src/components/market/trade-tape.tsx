@@ -193,11 +193,11 @@ function TradeRow({ trade, account }: { trade: MarketTrade; account?: string }) 
       </time>
 
       <div className="flex min-w-0 flex-col gap-0.5">
-        <p className="flex min-w-0 items-center gap-1.5 font-medium">
-          <span className="truncate">{seller}</span>
+        <p className="flex min-w-0 flex-wrap items-center gap-x-1.5 font-medium leading-snug">
+          <span className="break-words">{seller}</span>
           <ArrowRight aria-hidden className="size-3.5 shrink-0 text-muted-foreground" />
           <span className="sr-only">sold to</span>
-          <span className={cn("truncate", mine && "text-accent-text")}>{buyer}</span>
+          <span className={cn("break-words", mine && "text-accent-text")}>{buyer}</span>
         </p>
         <p className="font-mono text-[0.6875rem] text-muted-foreground" title={trade.readingId}>
           <span className="sr-only">Reading </span>
