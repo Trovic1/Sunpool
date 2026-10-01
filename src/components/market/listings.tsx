@@ -16,8 +16,9 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import type { Market, MarketListing } from "@/hooks/use-market"
-import { formatCusd, formatKwh, formatPrice, minuteLabel } from "@/lib/format"
+import { formatCusd, formatKwh, formatPrice, minuteLabel, partyName } from "@/lib/format"
 import { DEMO_SELLER, houseById } from "@/lib/seed"
+import { cn } from "@/lib/utils"
 
 export function Listings({ market, onListSurplus }: { market: Market; onListSurplus: () => void }) {
   const { listings, status, suggestion } = market
@@ -35,7 +36,7 @@ export function Listings({ market, onListSurplus }: { market: Market; onListSurp
             Each listing is backed by a meter reading that can be claimed once. The suggested fair
             price right now is{" "}
             <span className="font-mono text-foreground tabular">{formatPrice(suggestion.price)}</span>{" "}
-            cUSD/kWh.
+            USDm/kWh.
           </p>
         </div>
         <Button size="lg" onClick={onListSurplus}>
@@ -80,7 +81,7 @@ export function Listings({ market, onListSurplus }: { market: Market; onListSurp
                 transition={{ type: "spring", duration: 0.3, bounce: 0 }}
                 className="border-b border-rule bg-background last:border-b-0"
               >
-                <ListingRow listing={listing} onBuy={() => market.buy(listing)} />
+                <ListingRow listing={listing} account={market.account} onBuy={() => market.buy(listing)} />
               </motion.li>
             ))}
           </AnimatePresence>
@@ -90,16 +91,37 @@ export function Listings({ market, onListSurplus }: { market: Market; onListSurp
   )
 }
 
-function ListingRow({ listing, onBuy }: { listing: MarketListing; onBuy: () => void }) {
-  const seller = houseById(listing.sellerId)
-  const own = listing.sellerId === DEMO_SELLER.id
+function ListingRow({
+  listing,
+  account,
+  onBuy,
+}: {
+  listing: MarketListing
+  account?: string
+  onBuy: () => void
+}) {
+  const house = houseById(listing.sellerId)
+  const own = account
+    ? listing.sellerId.toLowerCase() === account.toLowerCase()
+    : listing.sellerId === DEMO_SELLER.id
+  const sellerName = house?.name ?? partyName(listing.sellerId, {}, account)
   const total = listing.kwh * listing.price
+  const listedAt =
+    listing.listedAt !== undefined
+      ? new Date(listing.listedAt * 1000).toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          timeZone: "Africa/Lagos",
+        })
+      : undefined
 
   return (
     <article className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 p-4 sm:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))_auto]">
       <div className="flex min-w-0 flex-col gap-0.5">
         <p className="flex items-center gap-2 font-medium">
-          <span className="truncate">{seller?.name}</span>
+          <span className={cn("truncate", sellerName.startsWith("0x") && "font-mono text-[0.9375rem]")} title={listing.sellerId}>
+            {sellerName}
+          </span>
           {own && <Badge variant="outline">Your listing</Badge>}
           {listing.pending && (
             <Badge variant="accent">
@@ -109,8 +131,27 @@ function ListingRow({ listing, onBuy }: { listing: MarketListing; onBuy: () => v
           )}
         </p>
         <p className="text-xs text-pretty text-muted-foreground">
-          {seller?.street} · {seller?.panelKw} kW rooftop · until{" "}
-          <span className="font-mono tabular">{minuteLabel(listing.untilMinute)}</span>
+          {house ? (
+            <>
+              {house.street} · {house.panelKw} kW rooftop
+              {listing.untilMinute !== undefined && (
+                <>
+                  {" "}
+                  · until <span className="font-mono tabular">{minuteLabel(listing.untilMinute)}</span>
+                </>
+              )}
+            </>
+          ) : (
+            <>
+              Signed meter reading
+              {listedAt && (
+                <>
+                  {" "}
+                  · listed <span className="font-mono tabular">{listedAt}</span> WAT
+                </>
+              )}
+            </>
+          )}
         </p>
       </div>
 
@@ -128,7 +169,7 @@ function ListingRow({ listing, onBuy }: { listing: MarketListing; onBuy: () => v
         </div>
         <div className="flex flex-col">
           <dt className="tag">Total</dt>
-          <dd className="font-mono tabular">{formatCusd(total)} cUSD</dd>
+          <dd className="font-mono tabular">{formatCusd(total)} USDm</dd>
         </div>
       </dl>
 
@@ -139,7 +180,7 @@ function ListingRow({ listing, onBuy }: { listing: MarketListing; onBuy: () => v
           disabled={listing.pending || own}
           aria-label={
             !listing.pending && !own
-              ? `Buy ${formatKwh(listing.kwh)} kWh from ${seller?.name} for ${formatCusd(total)} cUSD`
+              ? `Buy ${formatKwh(listing.kwh)} kWh from ${sellerName} for ${formatCusd(total)} USDm`
               : undefined
           }
           className="min-w-24"
