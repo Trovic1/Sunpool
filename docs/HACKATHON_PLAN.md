@@ -26,6 +26,24 @@ Each scenario names a seller, a buyer and the pain Sunpool removes. These are pr
 
 Important honesty point for the pitch: Sunpool handles **metering, accounting, payment and certification**. The electricity itself flows over existing wiring, a shared mini-grid or the distribution network. Physical delivery and the regulatory side **(verify: Nigerian mini-grid / NERC rules for peer-to-peer sales)** belong in the "path to production" slide.
 
+## 2b. How the electricity actually reaches the buyer
+
+Electricity cannot travel through the app. A physical wire delivers it; Sunpool is the trust and payment layer on top: metering, matching, payment and certificates that cannot be claimed twice. There are three delivery paths, in order of how soon they are realistic:
+
+1. **Direct cable to the next house or shop.** The seller's inverter feeds a line to the neighbour, with a meter on that line. This mirrors the familiar practice of sharing generator power with a neighbour for a fee, with metered readings and instant payment instead of guesswork. Needs a qualified electrician and a meter per line.
+2. **Shared line in an estate or compound (mini-grid).** Every house exports surplus into a shared distribution line and every meter records what it draws. Sunpool matches sellers and buyers, settles payment and issues certificates. **This is the first realistic deployment**, because the wires and an operator already exist.
+3. **Through the public grid (virtual trading).** The seller exports to the grid, the buyer imports from it, and the two are matched on paper. This is how peer-to-peer pilots work in some other countries. It needs the distribution company and the regulator to allow it **(verify: status in Nigeria)**, so it is a future path.
+
+### Why would a buyer not just install their own panels?
+
+- **Upfront cost.** A solar-plus-battery system is a large one-time purchase **(verify: typical Lagos price)**; buying kWh is pay-as-you-go.
+- **Renters.** You cannot put panels on a roof you do not own **(verify: share of Lagos households renting)**.
+- **No usable roof.** Flats, shops in plazas and shaded buildings generate little.
+- **Small or daytime-only needs.** A barber or tailor needs power during working hours; a full system is overkill.
+- **The seller wins too.** Midday output exceeds what a home uses, and once the battery is full the surplus is wasted. Selling it pays back the system faster, which makes buying panels more attractive for those who can afford them.
+
+Pitch framing: first customers are **estates, compounds and mini-grid operators**, where a shared line already connects sellers and buyers. Safety and regulation are named on the path-to-production slide, not hidden.
+
 ## 3. How it scales (the production path)
 
 | Today (demo) | Production |
