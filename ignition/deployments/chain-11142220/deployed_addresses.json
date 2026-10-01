@@ -1,5 +1,8 @@
 {
   "Sunpool#RECToken": "0xC92552b83C094E8052d9b8B4EDba34A3E1bA4ec6",
   "Sunpool#ReadingRegistry": "0xdA4575C3C30F5E81E0d57Ed96fd6ba39a2FE8b10",
-  "Sunpool#EnergyMarket": "0xEc37879ac09BE6C49539de1B3CE29eb9f220f602"
+  "Sunpool#EnergyMarket": "0xEc37879ac09BE6C49539de1B3CE29eb9f220f602",
+  "SunpoolUsdcMarket#RECToken": "0xC92552b83C094E8052d9b8B4EDba34A3E1bA4ec6",
+  "SunpoolUsdcMarket#ReadingRegistry": "0xdA4575C3C30F5E81E0d57Ed96fd6ba39a2FE8b10",
+  "SunpoolUsdcMarket#EnergyMarket": "0xAd7dF1530410e4eA9a6CAcb0C9C993958Aef0A29"
 }
