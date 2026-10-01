@@ -24,7 +24,21 @@ export default defineConfig({
       accounts: [configVariable("DEPLOYER_PRIVATE_KEY")],
     },
   },
+  chainDescriptors: {
+    [CELO_SEPOLIA.id]: {
+      name: CELO_SEPOLIA.name,
+      blockExplorers: {
+        blockscout: {
+          name: "Celo Sepolia Blockscout",
+          url: CELO_SEPOLIA.explorerUrl,
+          apiUrl: `${CELO_SEPOLIA.explorerUrl}/api`,
+        },
+      },
+    },
+  },
   verify: {
     blockscout: { enabled: true },
+    etherscan: { enabled: false },
+    sourcify: { enabled: false },
   },
 })
