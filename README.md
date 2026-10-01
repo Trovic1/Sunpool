@@ -57,7 +57,8 @@ Source is verified on Blockscout. Network details live in `src/lib/chain/celo.ts
 | Market screen on Celo Sepolia: wallet, buy, list, live tape, counters | Done |
 | Double-claim test page (live contract) | Done |
 | Seeded offline demo (`?source=seeded`) | Done |
-| My Home, Certificate Ledger, About / Impact | Planned |
+| About & impact page (delivery paths, use cases, sourced numbers, production path) | Done |
+| My Home, Certificate Ledger | Planned |
 
 ## Run it
 

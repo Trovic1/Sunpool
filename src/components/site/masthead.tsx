@@ -2,12 +2,45 @@
 
 import { Sun, Wallet } from "lucide-react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { WalletButton } from "@/components/wallet/wallet-button"
 import { useDataSource } from "@/hooks/use-data-source"
+import { cn } from "@/lib/utils"
+
+const NAV = [
+  { href: "/", label: "Market" },
+  { href: "/double-claim", label: "Double-claim test" },
+  { href: "/about", label: "About & impact" },
+] as const
+
+function NavLinks({ className }: { className?: string }) {
+  const pathname = usePathname()
+  return (
+    <ul className={cn("flex items-center gap-4 text-sm", className)}>
+      {NAV.map((item) => {
+        const active = pathname === item.href
+        return (
+          <li key={item.href} className="shrink-0">
+            <Link
+              href={item.href}
+              aria-current={active ? "page" : undefined}
+              className={cn(
+                "rounded-sm underline-offset-4 hover:underline",
+                active && "font-medium underline decoration-primary decoration-2",
+              )}
+            >
+              {item.label}
+            </Link>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
 
 export function Masthead() {
   const source = useDataSource()
@@ -22,18 +55,7 @@ export function Masthead() {
             <span className="font-display text-xl font-semibold tracking-tight">Sunpool</span>
           </Link>
           <nav aria-label="Main" className="hidden md:block">
-            <ul className="flex items-center gap-4 text-sm">
-              <li>
-                <Link href="/" className="rounded-sm hover:underline hover:underline-offset-4">
-                  Market
-                </Link>
-              </li>
-              <li>
-                <Link href="/double-claim" className="rounded-sm hover:underline hover:underline-offset-4">
-                  Double-claim test
-                </Link>
-              </li>
-            </ul>
+            <NavLinks />
           </nav>
         </div>
 
@@ -58,6 +80,9 @@ export function Masthead() {
           )}
         </div>
       </div>
+      <nav aria-label="Main" className="border-t border-rule md:hidden">
+        <NavLinks className="overflow-x-auto px-4 py-2" />
+      </nav>
     </header>
   )
 }
