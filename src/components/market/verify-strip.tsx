@@ -1,4 +1,5 @@
 import { FileSignature, Fingerprint, ReceiptText } from "lucide-react"
+import Link from "next/link"
 
 const STEPS = [
   {
@@ -13,8 +14,8 @@ const STEPS = [
   },
   {
     icon: ReceiptText,
-    title: "Certificate minted, cUSD settles",
-    body: "The buyer pays the seller in cUSD and receives a renewable energy certificate for exactly those kWh.",
+    title: "Certificate minted, USDm settles",
+    body: "The buyer pays the seller in USDm and receives a renewable energy certificate for exactly those kWh.",
   },
 ] as const
 
@@ -39,9 +40,13 @@ export function VerifyStrip() {
           </li>
         ))}
       </ol>
-      <p className="text-xs text-muted-foreground">
-        In this seeded demo, signatures and settlement are simulated. They move on-chain when the
-        contracts deploy to Celo testnet.
+      <p className="text-sm text-pretty text-muted-foreground">
+        Steps two and three run on Celo Sepolia. The meter in step one is simulated until certified
+        hardware signs readings.{" "}
+        <Link href="/double-claim" className="text-accent-text underline underline-offset-2">
+          Try claiming the same reading twice
+        </Link>
+        .
       </p>
     </section>
   )

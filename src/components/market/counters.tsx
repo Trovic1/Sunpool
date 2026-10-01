@@ -14,7 +14,8 @@ const fmtInt = (n: number) => Math.round(n).toLocaleString("en-US")
 const fmtKg = (n: number) => formatKwh(n)
 
 export function Counters({ market }: { market: Market }) {
-  const { totals, status } = market
+  const { totals, status, mode } = market
+  const chain = mode === "chain"
   const loading = status === "loading"
 
   return (
@@ -27,7 +28,7 @@ export function Counters({ market }: { market: Market }) {
       </h2>
 
       <div className="col-span-2 flex flex-col gap-1 bg-background p-4 sm:col-span-1 sm:p-5">
-        <p className="tag">Energy traded today</p>
+        <p className="tag">{chain ? "Energy traded on-chain" : "Energy traded today"}</p>
         {loading ? (
           <Skeleton className="h-12 w-40" />
         ) : (
@@ -40,8 +41,8 @@ export function Counters({ market }: { market: Market }) {
           <Skeleton className="h-5 w-48" />
         ) : (
           <p className="text-sm text-muted-foreground">
-            <span className="font-mono tabular text-foreground">{formatCusd(totals.cusd)}</span> cUSD
-            settled between neighbors
+            <span className="font-mono tabular text-foreground">{formatCusd(totals.cusd)}</span> USDm{" "}
+            {chain ? "settled on Celo Sepolia" : "settled between neighbors"}
           </p>
         )}
       </div>
@@ -55,7 +56,9 @@ export function Counters({ market }: { market: Market }) {
             <AnimatedNumber value={totals.certificates} format={fmtInt} />
           </p>
         )}
-        <p className="text-sm text-muted-foreground">One per verified reading</p>
+        <p className="text-sm text-muted-foreground">
+          {chain ? "ERC-721, one per verified reading" : "One per verified reading"}
+        </p>
       </div>
 
       <div className="flex flex-col gap-1 bg-background p-4 sm:p-5">
