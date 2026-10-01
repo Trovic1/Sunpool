@@ -20,9 +20,19 @@ A neighborhood market where rooftop owners list surplus kWh and neighbors buy it
 - Neighbors without panels, often phone-first and potentially in MiniPay (buyers)
 - Community energy / microgrid coordinators
 
+## Links
+
+- Live demo: https://sunpool-gamma.vercel.app
+- Double-claim test: https://sunpool-gamma.vercel.app/double-claim
+- Contracts (Celo Sepolia, verified on Blockscout): ReadingRegistry `0xdA4575C3C30F5E81E0d57Ed96fd6ba39a2FE8b10`, RECToken `0xC92552b83C094E8052d9b8B4EDba34A3E1bA4ec6`, EnergyMarket `0xEc37879ac09BE6C49539de1B3CE29eb9f220f602`
+
 ## What works today
 
-- Market screen on seeded, clearly labeled simulated data for Surulere, Lagos
+- Contracts live on Celo Sepolia: signed meter readings verified on-chain (EIP-712), each reading ID consumable once (`ReadingAlreadyConsumed`), USDm settlement, ERC-721 certificates with meter ID, reading ID, timestamp and Wh. 20 tests cover double claims, bad signatures, settlement math and access control.
+- The Market reads real listings and settled trades from the chain; wallets (MetaMask, MiniPay) can list surplus and buy.
+- Double-claim page replays an already-consumed reading against the live contract and shows the rejection, no wallet needed.
+
+- Offline seeded mode (`?source=seeded`) for Surulere, Lagos, clearly labeled as simulated
 - Live trade tape with pause/resume, optimistic "Pending" rows and screen-reader announcements
 - Generation chart: metered (simulated) vs forecast with a confidence band, keyboard steppable, with a data table
 - Counters: kWh traded, certificates minted, estimated CO₂ avoided with the emission factor and its source visible
@@ -35,6 +45,6 @@ _To fill in: MiniPay distribution, smart meter / inverter API onboarding, per-ne
 
 ## Honesty notes
 
-- Meter data is simulated in the demo and labeled as such.
+- Meter data is simulated: a server-side meter key signs readings. Trades, payments and certificates are real testnet transactions. Labeled in the UI footer and README.
 - CO₂ avoided is an estimate using 0.456 kg CO₂e/kWh (Nigeria grid 2025, Ember via Our World in Data).
 - Forecasts are shown with a confidence band.
