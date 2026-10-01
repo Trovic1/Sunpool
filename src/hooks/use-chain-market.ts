@@ -10,6 +10,7 @@ import { readContract, waitForTransactionReceipt, writeContract } from "wagmi/ac
 import { SETTLEMENT_TOKEN } from "@/lib/chain/celo"
 import { SUNPOOL_CONTRACTS, erc20Abi, explorerTx, marketAbiWithErrors, type SignedReading } from "@/lib/chain/contracts"
 import { explainError } from "@/lib/chain/errors"
+import { retryOnStaleNonce, waitForWalletToCatchUp } from "@/lib/chain/wallet-sync"
 import type { MarketSnapshot } from "@/lib/chain/server"
 import { buildGenerationSeries, suggestPrice } from "@/lib/forecast"
 import { CURRENCY, formatCusd, formatKwh, formatPrice, shortAddress } from "@/lib/format"
@@ -156,18 +157,22 @@ export function useChainMarket(): MarketModel {
           })
           toast.loading("Waiting for the approval to confirm…", { id: toastId, description: txLink(approveHash) })
           await waitForTransactionReceipt(config, { hash: approveHash })
+          toast.loading("Approval confirmed. Syncing your wallet…", { id: toastId, description: txLink(approveHash) })
+          await waitForWalletToCatchUp(config, account, approveHash)
         }
 
         toast.loading("Confirm the purchase in your wallet", {
           id: toastId,
           description: allowance < total ? "Step 2 of 2" : undefined,
         })
-        const hash = await writeContract(config, {
-          address: SUNPOOL_CONTRACTS.energyMarket,
-          abi: marketAbiWithErrors,
-          functionName: "buy",
-          args: [BigInt(listing.id), price],
-        })
+        const hash = await retryOnStaleNonce(() =>
+          writeContract(config, {
+            address: SUNPOOL_CONTRACTS.energyMarket,
+            abi: marketAbiWithErrors,
+            functionName: "buy",
+            args: [BigInt(listing.id), price],
+          }),
+        )
         toast.loading("Settling on Celo Sepolia…", { id: toastId, description: txLink(hash) })
         const receipt = await waitForTransactionReceipt(config, { hash })
         if (receipt.status !== "success") throw new Error("The purchase transaction reverted.")
