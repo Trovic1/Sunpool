@@ -1,7 +1,8 @@
 "use client"
 
 import { motion, useReducedMotion, type Variants } from "framer-motion"
-import { useState } from "react"
+import { useQueryState } from "nuqs"
+import { useEffect, useState } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import type { MarketModel } from "@/hooks/market-types"
@@ -25,6 +26,11 @@ export function MarketScreen() {
 }
 
 function ChainMarket() {
+  // ?state= only drives the seeded demo; drop it so on-chain URLs stay clean.
+  const [state, setState] = useQueryState("state")
+  useEffect(() => {
+    if (state) void setState(null)
+  }, [state, setState])
   return <MarketView market={useChainMarket()} />
 }
 
