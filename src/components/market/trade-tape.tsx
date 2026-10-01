@@ -18,7 +18,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { explorerTx } from "@/lib/chain/contracts"
-import { formatCusd, formatKwh, formatPrice, minuteLabel, partyName } from "@/lib/format"
+import { CURRENCY, formatCusd, formatKwh, formatPrice, minuteLabel, partyName } from "@/lib/format"
 import { DEMO_BUYER, HOUSES, NEIGHBORHOOD } from "@/lib/seed"
 import type { MarketTrade } from "@/hooks/market-types"
 import type { Market } from "@/hooks/use-market"
@@ -211,7 +211,7 @@ function TradeRow({ trade, account }: { trade: MarketTrade; account?: string }) 
           <span className="text-muted-foreground"> kWh</span>
         </p>
         <p className="font-mono text-xs text-muted-foreground tabular">
-          {formatCusd(total)} USDm <span className="hidden sm:inline">@ {formatPrice(trade.price)}</span>
+          {formatCusd(total)} {CURRENCY} <span className="hidden sm:inline">@ {formatPrice(trade.price)}</span>
         </p>
         {trade.status === "pending" ? (
           <Badge variant="outline" className="mt-0.5">

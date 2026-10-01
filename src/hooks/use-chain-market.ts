@@ -3,16 +3,16 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { createElement, useCallback, useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
-import { parseUnits, type Address } from "viem"
+import { formatUnits, parseUnits, type Address } from "viem"
 import { useConfig } from "wagmi"
 import { readContract, waitForTransactionReceipt, writeContract } from "wagmi/actions"
 
-import { CELO_SEPOLIA } from "@/lib/chain/celo"
+import { SETTLEMENT_TOKEN } from "@/lib/chain/celo"
 import { SUNPOOL_CONTRACTS, erc20Abi, explorerTx, marketAbiWithErrors, type SignedReading } from "@/lib/chain/contracts"
 import { explainError } from "@/lib/chain/errors"
 import type { MarketSnapshot } from "@/lib/chain/server"
 import { buildGenerationSeries, suggestPrice } from "@/lib/forecast"
-import { formatCusd, formatKwh, formatPrice, shortAddress } from "@/lib/format"
+import { CURRENCY, formatCusd, formatKwh, formatPrice, shortAddress } from "@/lib/format"
 import { EMISSION_FACTOR, seedTrades } from "@/lib/seed"
 
 import type { ListSurplusInput, MarketListing, MarketModel, MarketTrade } from "./market-types"
@@ -65,7 +65,7 @@ export function useChainMarket(): MarketModel {
   // Announce the newest settled trade; recomputes only when it changes.
   const latest = snapshot?.trades[0]
   const announcement = latest
-    ? `Trade settled: ${formatKwh(latest.wh / 1000)} kWh at ${formatPrice(latest.price)} ${CELO_SEPOLIA.stablecoin.symbol} per kWh.`
+    ? `Trade settled: ${formatKwh(latest.wh / 1000)} kWh at ${formatPrice(latest.price)} ${CURRENCY} per kWh.`
     : ""
 
   const trades: MarketTrade[] = useMemo(() => {
@@ -127,7 +127,7 @@ export function useChainMarket(): MarketModel {
       }
       setPendingListings((s) => new Set(s).add(listing.id))
       setOptimisticTrades((t) => [pendingTrade, ...t])
-      const toastId = toast.loading("Checking your USDm balance…")
+      const toastId = toast.loading(`Checking your ${CURRENCY} balance…`)
 
       try {
         const balance = await readContract(config, {
@@ -147,7 +147,7 @@ export function useChainMarket(): MarketModel {
           args: [account, SUNPOOL_CONTRACTS.energyMarket],
         })
         if (allowance < total) {
-          toast.loading("Approve USDm in your wallet", { id: toastId, description: "Step 1 of 2" })
+          toast.loading(`Approve ${CURRENCY} in your wallet`, { id: toastId, description: "Step 1 of 2" })
           const approveHash = await writeContract(config, {
             address: SUNPOOL_CONTRACTS.stablecoin,
             abi: erc20Abi,
@@ -177,7 +177,7 @@ export function useChainMarket(): MarketModel {
           description: createElement(
             "span",
             null,
-            `${formatCusd(Number(total) / 1e18)} USDm paid. Certificate minted to your wallet. `,
+            `${formatCusd(Number(formatUnits(total, SETTLEMENT_TOKEN.decimals)))} ${CURRENCY} paid. Certificate minted to your wallet. `,
             txLink(hash),
           ),
         })
@@ -186,8 +186,8 @@ export function useChainMarket(): MarketModel {
         const usdm = (error as { usdm?: boolean }).usdm
         const e = usdm
           ? {
-              title: "Not enough USDm",
-              description: "Swap some test CELO for USDm at app.mento.org (Celo Sepolia), then buy again.",
+              title: `Not enough ${CURRENCY}`,
+              description: `Get free test ${CURRENCY} at faucet.circle.com (pick Celo Sepolia), then buy again.`,
             }
           : explainError(error)
         if (e.cancelled) toast(e.title, { id: toastId, description: e.description })
@@ -248,12 +248,12 @@ export function useChainMarket(): MarketModel {
           address: SUNPOOL_CONTRACTS.energyMarket,
           abi: marketAbiWithErrors,
           functionName: "list",
-          args: [signed.reading, signed.signature, parseUnits(price.toFixed(6), CELO_SEPOLIA.stablecoin.decimals)],
+          args: [signed.reading, signed.signature, parseUnits(price.toFixed(SETTLEMENT_TOKEN.decimals), SETTLEMENT_TOKEN.decimals)],
         })
         toast.loading("Publishing on Celo Sepolia…", { id: toastId, description: txLink(hash) })
         const receipt = await waitForTransactionReceipt(config, { hash })
         if (receipt.status !== "success") throw new Error("The listing transaction reverted.")
-        toast.success(`Listed ${formatKwh(kwh)} kWh at ${formatPrice(price)} USDm/kWh`, {
+        toast.success(`Listed ${formatKwh(kwh)} kWh at ${formatPrice(price)} ${CURRENCY}/kWh`, {
           id: toastId,
           description: createElement("span", null, "Reading consumed on-chain. ", txLink(hash)),
         })

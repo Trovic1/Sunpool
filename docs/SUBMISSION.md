@@ -12,7 +12,7 @@ In Lagos, grid supply is unreliable and many homes run diesel generators, while 
 
 ## Solution
 
-A neighborhood market where rooftop owners list surplus kWh and neighbors buy it in cUSD on Celo. Each sale is backed by a signed meter reading whose ID can be consumed once, which mints exactly one renewable energy certificate. A transparent forecast and price suggestion help sellers list a fair amount at a fair price.
+A neighborhood market where rooftop owners list surplus kWh and neighbors buy it with a dollar stablecoin on Celo (USDm, formerly cUSD, on mainnet; USDC on the testnet demo). Each sale is backed by a signed meter reading whose ID can be consumed once, which mints exactly one renewable energy certificate. A transparent forecast and price suggestion help sellers list a fair amount at a fair price.
 
 ## Target users
 
@@ -24,11 +24,11 @@ A neighborhood market where rooftop owners list surplus kWh and neighbors buy it
 
 - Live demo: https://sunpool-gamma.vercel.app
 - Double-claim test: https://sunpool-gamma.vercel.app/double-claim
-- Contracts (Celo Sepolia, verified on Blockscout): ReadingRegistry `0xdA4575C3C30F5E81E0d57Ed96fd6ba39a2FE8b10`, RECToken `0xC92552b83C094E8052d9b8B4EDba34A3E1bA4ec6`, EnergyMarket `0xEc37879ac09BE6C49539de1B3CE29eb9f220f602`
+- Contracts (Celo Sepolia, verified on Blockscout): ReadingRegistry `0xdA4575C3C30F5E81E0d57Ed96fd6ba39a2FE8b10`, RECToken `0xC92552b83C094E8052d9b8B4EDba34A3E1bA4ec6`, EnergyMarket (USDC) `0xAd7dF1530410e4eA9a6CAcb0C9C993958Aef0A29`
 
 ## What works today
 
-- Contracts live on Celo Sepolia: signed meter readings verified on-chain (EIP-712), each reading ID consumable once (`ReadingAlreadyConsumed`), USDm settlement, ERC-721 certificates with meter ID, reading ID, timestamp and Wh. 20 tests cover double claims, bad signatures, settlement math and access control.
+- Contracts live on Celo Sepolia: signed meter readings verified on-chain (EIP-712), each reading ID consumable once (`ReadingAlreadyConsumed`), stablecoin settlement (USDC on testnet; USDm, formerly cUSD, on mainnet), ERC-721 certificates with meter ID, reading ID, timestamp and Wh. 20 tests cover double claims, bad signatures, settlement math and access control.
 - The Market reads real listings and settled trades from the chain; wallets (MetaMask, MiniPay) can list surplus and buy.
 - Double-claim page replays an already-consumed reading against the live contract and shows the rejection, no wallet needed.
 

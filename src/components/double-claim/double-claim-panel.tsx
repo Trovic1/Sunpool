@@ -4,7 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { ArrowUpRight, CircleCheck, OctagonX, Play, RotateCcw, Wallet } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
-import { BaseError, ContractFunctionRevertedError, type Address, type Hex } from "viem"
+import { BaseError, ContractFunctionRevertedError, parseUnits, type Address, type Hex } from "viem"
 import { useConfig, usePublicClient } from "wagmi"
 import { waitForTransactionReceipt, writeContract } from "wagmi/actions"
 
@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Spinner } from "@/components/ui/spinner"
 import { useWallet } from "@/hooks/use-wallet"
-import { CELO_SEPOLIA } from "@/lib/chain/celo"
+import { CELO_SEPOLIA, SETTLEMENT_TOKEN } from "@/lib/chain/celo"
 import {
   SUNPOOL_CONTRACTS,
   explorerAddress,
@@ -26,7 +26,7 @@ import fixture from "@/lib/chain/double-claim-fixture.json"
 
 type Step = { id: string; label: string; state: "running" | "ok" | "rejected" | "error"; detail?: React.ReactNode }
 
-const FIXTURE: SignedReading & { firstClaimTx: Hex; pricePerKwh: bigint } = {
+const FIXTURE: SignedReading & { firstClaimTx: Hex } = {
   reading: {
     readingId: fixture.reading.readingId as Hex,
     meterId: fixture.reading.meterId as Hex,
@@ -36,7 +36,6 @@ const FIXTURE: SignedReading & { firstClaimTx: Hex; pricePerKwh: bigint } = {
   },
   signature: fixture.signature as Hex,
   firstClaimTx: fixture.firstClaimTx as Hex,
-  pricePerKwh: BigInt(fixture.pricePerKwh),
 }
 
 type Rejection = { name: string; args: readonly unknown[] }
@@ -117,7 +116,7 @@ export function DoubleClaimPanel() {
         ),
       },
     ])
-    const rejected = await attemptClaim("second", FIXTURE, FIXTURE.pricePerKwh)
+    const rejected = await attemptClaim("second", FIXTURE, parseUnits("0.125", SETTLEMENT_TOKEN.decimals))
     toast[rejected ? "success" : "error"](rejected ? "Second claim rejected on-chain" : "Unexpected result", {
       description: rejected ? "ReadingAlreadyConsumed: the same kWh cannot be certified twice." : "See the log below.",
     })
@@ -149,7 +148,7 @@ export function DoubleClaimPanel() {
         detail: <code className="font-mono text-sm">{shortHex(signed.reading.readingId)}</code>,
       })
 
-      const price = 125_000_000_000_000_000n
+      const price = parseUnits("0.125", SETTLEMENT_TOKEN.decimals)
       push({ id: "first", label: "First claim: confirm the listing in your wallet…", state: "running" })
       const hash = await writeContract(config, {
         address: SUNPOOL_CONTRACTS.energyMarket,

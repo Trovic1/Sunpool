@@ -26,7 +26,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Sunpool · Neighborhood solar trading",
   description:
-    "Households with rooftop solar sell surplus kWh to neighbors, settled in USDm (formerly cUSD) on Celo. Every verified kWh mints a certificate that can only be claimed once.",
+    "Households with rooftop solar sell surplus kWh to neighbors, settled in dollar stablecoins on Celo. Every verified kWh mints a certificate that can only be claimed once.",
 }
 
 export const viewport: Viewport = {
