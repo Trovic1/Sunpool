@@ -20,7 +20,7 @@ const NAV = [
 function NavLinks({ className }: { className?: string }) {
   const pathname = usePathname()
   return (
-    <ul className={cn("flex items-center gap-4 text-sm", className)}>
+    <ul className={cn("flex items-center gap-1 text-sm", className)}>
       {NAV.map((item) => {
         const active = pathname === item.href
         return (
@@ -29,8 +29,8 @@ function NavLinks({ className }: { className?: string }) {
               href={item.href}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "rounded-sm underline-offset-4 hover:underline",
-                active && "font-medium underline decoration-primary decoration-2",
+                "inline-flex h-9 items-center rounded-full px-3 font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+                active && "bg-foreground text-background hover:bg-foreground hover:text-background",
               )}
             >
               {item.label}
@@ -45,14 +45,14 @@ function NavLinks({ className }: { className?: string }) {
 export function Masthead() {
   const source = useDataSource()
   return (
-    <header className="border-b border-foreground">
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+    <header className="border-b border-border bg-background">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2 rounded-sm" aria-label="Sunpool, market home">
-            <span className="flex size-7 items-center justify-center rounded-full border border-foreground bg-primary">
-              <Sun aria-hidden className="size-4" strokeWidth={2} />
+            <span className="flex size-8 items-center justify-center rounded-full bg-sun text-sun-foreground">
+              <Sun aria-hidden className="size-[18px]" strokeWidth={2.25} />
             </span>
-            <span className="font-display text-xl font-semibold tracking-tight">Sunpool</span>
+            <span className="font-display text-xl font-bold">Sunpool</span>
           </Link>
           <nav aria-label="Main" className="hidden md:block">
             <NavLinks />
@@ -80,8 +80,8 @@ export function Masthead() {
           )}
         </div>
       </div>
-      <nav aria-label="Main" className="border-t border-rule md:hidden">
-        <NavLinks className="overflow-x-auto px-4 py-2" />
+      <nav aria-label="Main" className="border-t border-border md:hidden">
+        <NavLinks className="overflow-x-auto px-3 py-2" />
       </nav>
     </header>
   )
