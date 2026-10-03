@@ -3,16 +3,14 @@
 @import "shadcn/tailwind.css";
 
 /*
- * Sunpool: Lagos daylight. See docs/DESIGN_DIRECTION.md and DESIGN.md.
- * One neutral ramp (ink on cool off-white) and one colour, sun yellow, used only as a filled
- * area for solar energy, money changing hands and the primary action.
- * Measured contrast:
- *   ink #111214 on paper #F7F7F4      17.46:1
- *   muted #5A5E66 on paper             6.06:1
- *   muted on sunk #ECECE7              5.49:1
- *   ink on sun #F2B705                10.31:1  (all text on yellow is ink)
- *   sun on paper                       1.69:1  (never text or thin lines on paper)
- *   amber text #8A6100 on paper        5.16:1  (small "sun" text, e.g. "You")
+ * Sunpool: Deep forest. See DESIGN.md and docs/DESIGN_DIRECTION.md.
+ * One dark green ramp and one colour, lime, for solar energy, money changing hands and the
+ * primary action. Dark only. Measured contrast:
+ *   text #EEF5EF on forest #0C1F18     15.47:1
+ *   muted #9DB3A6 on forest             7.70:1  (6.91:1 on card #13291F)
+ *   lime #C8F25A on forest             13.31:1  (lime is safe as text here)
+ *   forest on lime                     13.31:1  (text on lime buttons)
+ *   error #FF8A7A on card               6.72:1
  */
 
 @theme inline {
@@ -50,7 +48,7 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
-  --shadow-float: 0 12px 32px -12px rgb(17 18 20 / 0.22), 0 2px 6px -2px rgb(17 18 20 / 0.08);
+  --shadow-float: 0 16px 40px -12px rgb(0 0 0 / 0.55), 0 2px 6px -2px rgb(0 0 0 / 0.3);
   --color-sun: var(--sun);
   --color-sun-foreground: var(--sun-foreground);
   --color-sun-wash: var(--sun-wash);
@@ -59,47 +57,48 @@
 }
 
 :root {
+  color-scheme: dark;
   /* primitives */
-  --paper: #f7f7f4;
-  --paper-raised: #ffffff;
-  --paper-sunk: #ecece7;
-  --ink: #111214;
-  --ink-muted: #5a5e66;
-  --sun-500: #f2b705;
-  --sun-100: #fdf1c4;
-  --sun-ink: #8a6100;
+  --forest-950: #0c1f18;
+  --forest-900: #13291f;
+  --forest-850: #1a3529;
+  --forest-800: #1f4033;
+  --mist: #eef5ef;
+  --mist-muted: #9db3a6;
+  --lime: #c8f25a;
+  --lime-hover: #d6f77f;
 
   /* semantic roles */
-  --background: var(--paper);
-  --foreground: var(--ink);
-  --card: var(--paper-raised);
-  --card-foreground: var(--ink);
-  --popover: var(--paper-raised);
-  --popover-foreground: var(--ink);
-  --primary: var(--sun-500);
-  --primary-foreground: var(--ink);
-  --secondary: var(--paper-sunk);
-  --secondary-foreground: var(--ink);
-  --muted: var(--paper-sunk);
-  --muted-foreground: var(--ink-muted);
-  --accent: var(--sun-100);
-  --accent-foreground: var(--ink);
-  --accent-text: var(--sun-ink);
-  --sun: var(--sun-500);
-  --sun-foreground: var(--ink);
-  --sun-wash: var(--sun-100);
-  --sun-muted: #3d3200; /* 6.98:1 on sun */
-  --destructive: #b42318;
-  --success: #1f7a3a;
-  --strong: var(--ink);
-  --border: color-mix(in oklab, var(--ink) 13%, transparent);
-  --rule: color-mix(in oklab, var(--ink) 9%, transparent);
-  --input: color-mix(in oklab, var(--ink) 28%, transparent);
-  --ring: var(--ink);
-  --chart-actual: var(--ink);
-  --chart-forecast: var(--ink-muted);
-  --chart-band: color-mix(in oklab, var(--ink) 8%, transparent);
-  --radius: 0.75rem;
+  --background: var(--forest-950);
+  --foreground: var(--mist);
+  --card: var(--forest-900);
+  --card-foreground: var(--mist);
+  --popover: var(--forest-900);
+  --popover-foreground: var(--mist);
+  --primary: var(--lime);
+  --primary-foreground: var(--forest-950);
+  --secondary: var(--forest-850);
+  --secondary-foreground: var(--mist);
+  --muted: var(--forest-850);
+  --muted-foreground: var(--mist-muted);
+  --accent: var(--forest-800);
+  --accent-foreground: var(--mist);
+  --accent-text: var(--lime);
+  --sun: var(--lime);
+  --sun-foreground: var(--forest-950);
+  --sun-wash: color-mix(in oklab, var(--lime) 18%, transparent);
+  --sun-muted: #2d4a10; /* on lime */
+  --destructive: #ff8a7a;
+  --success: #86e0a4;
+  --strong: var(--mist);
+  --border: color-mix(in oklab, var(--mist) 10%, transparent);
+  --rule: color-mix(in oklab, var(--mist) 7%, transparent);
+  --input: color-mix(in oklab, var(--mist) 22%, transparent);
+  --ring: var(--lime);
+  --chart-actual: var(--lime);
+  --chart-forecast: var(--mist-muted);
+  --chart-band: color-mix(in oklab, var(--mist) 8%, transparent);
+  --radius: 1rem;
 }
 
 @layer base {
@@ -114,17 +113,17 @@
     @apply bg-background text-foreground;
   }
   :focus-visible {
-    outline: 2px solid var(--ink);
+    outline: 2px solid var(--lime);
     outline-offset: 2px;
   }
   ::selection {
-    background: var(--sun-500);
-    color: var(--ink);
+    background: var(--lime);
+    color: var(--forest-950);
   }
   html {
-    caret-color: var(--ink);
-    accent-color: var(--ink);
-    scrollbar-color: color-mix(in oklab, var(--ink) 28%, transparent) transparent;
+    caret-color: var(--lime);
+    accent-color: var(--lime);
+    scrollbar-color: color-mix(in oklab, var(--mist) 22%, transparent) transparent;
     scrollbar-width: thin;
   }
   a {
