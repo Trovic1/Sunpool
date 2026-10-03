@@ -78,15 +78,16 @@ Design skills come from the `designb` workflow. Before any UI work, read the ins
 - The forecast chart shows a confidence band. Do not present it as exact.
 - Do not invent testimonials, partners, or user numbers.
 
-## Design direction: Warm Editorial
+## Design direction: Lagos daylight
 
-Brand: calm, trustworthy, sunlit, civic. Not crypto-bro. Personality: warm, precise, quietly confident.
+Brand: calm, trustworthy, sunlit, civic. Not crypto-bro. Personality: warm, precise, quietly confident. Replaced Warm Editorial on 2026-10-03; full contract in `docs/DESIGN_DIRECTION.md`, tokens in `DESIGN.md`.
 
-- **Background:** warm off-white `#faf9f6`. Text: ink `#1a1714`.
-- **Accent (only one):** Warm Terracotta `#ea580c` for primary actions, live states, and key numbers.
-- **Borders:** sharp 1px dark ink borders, small radius, restrained card depth (flat with a subtle offset shadow on hover, no glows).
-- **Type:** serif display for headlines (Fraunces or Instrument Serif), clean sans for body (Geist or Inter Tight), **JetBrains Mono** for kWh, prices, addresses, and tx hashes.
-- **Hierarchy:** large editorial headlines against small, muted metadata tags.
+- **Background:** cool off-white `#f7f7f4`, raised panels white. Text: near-black ink `#111214`.
+- **Accent (only one):** sun yellow `#f2b705`, used only as a filled area (band, buttons, metered chart area, badges) with ink on top. Never yellow text or thin yellow lines on the light ground.
+- **Borders:** ink hairlines at ~13%, 8px control radius, 12px panel radius, pills only for status. No offset shadows; only floating layers (popover, dialog, tooltip) get a soft shadow.
+- **Type:** Bricolage Grotesque for headings, Geist for UI and body, **JetBrains Mono** for kWh, prices, addresses, and tx hashes.
+- **Hierarchy:** big bold headings and big mono numbers; no eyebrow labels, no 01/02/03 numbering, no em-dashes in UI copy.
+- **Signature move:** sun fill. Anything that is solar energy is drawn as a yellow filled area.
 - **Motion:** fast springs, staggered enters, a live trade tape that slides in new rows, numbers that count up. Purposeful only.
 - **Above the fold:** live neighborhood trade tape + today's generation curve with forecast overlay + the "kWh traded / certificates minted / CO2 avoided (est.)" counters.
 
