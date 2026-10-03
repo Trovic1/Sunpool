@@ -182,7 +182,7 @@ export function DoubleClaimPanel() {
     <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
       <Card>
         <CardHeader>
-          <CardTitle className="font-display text-xl font-medium">The reading under test</CardTitle>
+          <CardTitle className="font-display text-xl font-bold">The reading under test</CardTitle>
           <CardDescription>Signed by the registered meter key and already claimed once on Celo Sepolia.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -215,7 +215,7 @@ export function DoubleClaimPanel() {
 
       <Card className="min-h-72">
         <CardHeader>
-          <CardTitle className="font-display text-xl font-medium">What the contract says</CardTitle>
+          <CardTitle className="font-display text-xl font-bold">What the contract says</CardTitle>
           <CardDescription>
             &ldquo;Claim it again&rdquo; replays the reading with a read-only call, so it needs no wallet or gas.
             &ldquo;Run it with my wallet&rdquo; claims a fresh reading for real, then tries the same reading a

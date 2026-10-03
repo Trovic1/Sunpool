@@ -16,7 +16,6 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { Suspense } from "react"
 
-import { Badge } from "@/components/ui/badge"
 import { Masthead } from "@/components/site/masthead"
 import { SiteFooter } from "@/components/site/site-footer"
 import { SUNPOOL_CONTRACTS, explorerAddress } from "@/lib/chain/contracts"
@@ -58,6 +57,12 @@ const STATS: { value: string; unit: string; label: string; source: Source }[] = 
     },
   },
 ]
+
+const COSTS = [
+  { label: "Diesel generator", value: 950, grid: false },
+  { label: "Petrol generator", value: 750, grid: false },
+  { label: "Grid, Band A", value: 225, grid: true },
+] as const
 
 type Path = {
   stage: string
@@ -181,11 +186,10 @@ function SourceLink({ source }: { source: Source }) {
   )
 }
 
-function SectionHeading({ tag, title, id, children }: { tag: string; title: string; id: string; children?: React.ReactNode }) {
+function SectionHeading({ title, id, children }: { title: string; id: string; children?: React.ReactNode }) {
   return (
-    <div className="flex max-w-3xl flex-col gap-2">
-      <p className="tag">{tag}</p>
-      <h2 id={id} className="font-display text-3xl font-medium tracking-tight sm:text-4xl">
+    <div className="flex max-w-3xl flex-col gap-3">
+      <h2 id={id} className="font-display text-3xl font-bold text-balance sm:text-4xl">
         {title}
       </h2>
       {children && <div className="text-pretty text-muted-foreground">{children}</div>}
@@ -196,17 +200,20 @@ function SectionHeading({ tag, title, id, children }: { tag: string; title: stri
 export default function AboutPage() {
   return (
     <>
-      <Suspense fallback={<div className="h-14 border-b border-foreground" />}>
+      <Suspense fallback={<div className="h-16 border-b border-border" />}>
         <Masthead />
       </Suspense>
       <main id="main" className="mx-auto flex w-full max-w-7xl flex-col gap-16 px-4 py-8 sm:px-6 sm:py-12">
         {/* Intro */}
-        <section aria-labelledby="about-heading" className="flex max-w-4xl flex-col gap-4">
-          <p className="tag">About & impact · IEEE ClimateChain 2026 · Renewable Energy & Energy Trading</p>
-          <h1 id="about-heading" className="font-display text-4xl leading-[1.05] font-medium tracking-tight text-balance sm:text-6xl">
+        <section
+          aria-labelledby="about-heading"
+          className="flex flex-col gap-4 rounded-lg bg-sun px-6 py-10 text-sun-foreground sm:px-10 sm:py-14"
+        >
+          <p className="text-sm font-medium text-sun-muted">IEEE ClimateChain 2026, Renewable Energy &amp; Energy Trading track</p>
+          <h1 id="about-heading" className="max-w-4xl font-display text-4xl leading-[1.02] font-bold text-balance sm:text-6xl">
             The trust layer for neighbourhood solar.
           </h1>
-          <p className="max-w-prose text-lg text-pretty text-muted-foreground">
+          <p className="max-w-prose text-lg text-pretty text-sun-muted">
             At noon in Lagos, one house has more solar power than it can use while the shop next door runs a
             generator. Sunpool lets the shop buy that surplus from a phone, pays the owner instantly, and issues a
             certificate for those exact kWh that can never be claimed twice.
@@ -214,81 +221,117 @@ export default function AboutPage() {
         </section>
 
         {/* Numbers */}
-        <section aria-labelledby="numbers-heading" className="flex flex-col gap-6">
-          <SectionHeading tag="Why it matters" title="Generator power costs three to four times the grid" id="numbers-heading" />
-          <ul className="grid gap-px overflow-hidden rounded-lg border border-foreground bg-foreground md:grid-cols-3">
-            {STATS.map((stat) => (
-              <li key={stat.value} className="flex flex-col gap-2 bg-background p-5">
-                <p className="font-mono text-5xl leading-none font-medium tracking-tight text-primary tabular">
-                  {stat.value}
-                  <span className="text-xl text-muted-foreground">{stat.unit}</span>
-                </p>
-                <p className="text-pretty">{stat.label}</p>
-                <SourceLink source={stat.source} />
-              </li>
-            ))}
-          </ul>
-          <p className="max-w-prose text-sm text-pretty text-muted-foreground">
-            A neighbour&rsquo;s daytime solar can be priced well below the generator and still pay the seller more
-            than the grid would. Nigerians spent an estimated ₦16.5 trillion on fuel and generators for
-            self-generated power in 2023.{" "}
-            <SourceLink
-              source={{
-                label: "Minister of Power, via Prime Business Africa",
-                href: "https://primebusiness.africa/nigerians-spend-n16-5trn-on-diesel-petrol-generators-for-self-generated-power-report",
-              }}
-            />
-          </p>
+        <section aria-labelledby="numbers-heading" className="grid gap-8 lg:grid-cols-12">
+          <div className="flex flex-col gap-6 lg:col-span-8">
+            <SectionHeading title="Generator power costs three to four times the grid" id="numbers-heading">
+              <p>
+                Cost of one kWh in Nigeria. A neighbour&rsquo;s daytime solar can be priced well below the generator
+                and still pay the seller more than the grid would.
+              </p>
+            </SectionHeading>
+            <figure className="flex flex-col gap-4 rounded-lg border border-border bg-card p-5 sm:p-6">
+              <figcaption className="sr-only">Cost per kWh: diesel generator, petrol generator and grid Band A</figcaption>
+              <ul className="flex flex-col gap-4">
+                {COSTS.map((c) => (
+                  <li key={c.label} className="grid gap-1.5 sm:grid-cols-[11rem_1fr] sm:items-center sm:gap-4">
+                    <span className="text-sm font-medium">{c.label}</span>
+                    <span className="flex items-center gap-3">
+                      <span
+                        aria-hidden
+                        className={c.grid ? "h-7 rounded-sm bg-foreground/20" : "h-7 rounded-sm bg-foreground"}
+                        style={{ width: `${(c.value / 950) * 100}%` }}
+                      />
+                      <span className="font-mono text-sm font-semibold whitespace-nowrap tabular">₦{c.value}/kWh</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p className="flex flex-wrap gap-x-4 gap-y-1">
+                <SourceLink source={STATS[0].source} />
+                <SourceLink source={STATS[1].source} />
+              </p>
+            </figure>
+          </div>
+          <aside className="flex flex-col justify-end gap-3 rounded-lg bg-foreground p-6 text-background lg:col-span-4">
+            <p className="font-mono text-7xl leading-none font-semibold tabular">51%</p>
+            <p className="text-pretty">of Lagos residents rent, so they cannot put panels on the roof above them.</p>
+            <a
+              href={STATS[2].source.href}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex w-fit items-center gap-0.5 text-xs text-background/75 underline underline-offset-2 hover:text-background"
+            >
+              {STATS[2].source.label}
+              <ArrowUpRight aria-hidden className="size-3" />
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+            <p className="border-t border-background/20 pt-3 text-sm text-pretty text-background/75">
+              Nigerians spent an estimated ₦16.5 trillion on fuel and generators for self-generated power in 2023.{" "}
+              <a
+                className="underline underline-offset-2 hover:text-background"
+                href="https://primebusiness.africa/nigerians-spend-n16-5trn-on-diesel-petrol-generators-for-self-generated-power-report"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Source
+              </a>
+            </p>
+          </aside>
         </section>
 
         {/* Delivery */}
         <section aria-labelledby="delivery-heading" className="flex flex-col gap-6">
-          <SectionHeading tag="The first question" title="How does the electricity reach the buyer?" id="delivery-heading">
+          <SectionHeading title="How does the electricity reach the buyer?" id="delivery-heading">
             <p>
               Electricity cannot travel through an app. A wire delivers it. Sunpool is the layer on top: metering,
               matching, payment and certificates that cannot be claimed twice.
             </p>
           </SectionHeading>
           <ol className="grid gap-4 lg:grid-cols-3">
-            {PATHS.map((path, i) => (
+            {PATHS.map((path) => (
               <li
                 key={path.title}
                 className={
                   path.emphasis
-                    ? "flex flex-col gap-4 rounded-lg border-2 border-primary bg-accent/40 p-5"
-                    : "flex flex-col gap-4 rounded-lg border border-foreground p-5"
+                    ? "flex flex-col gap-4 rounded-lg bg-sun p-5 text-sun-foreground"
+                    : "flex flex-col gap-4 rounded-lg border border-border bg-card p-5"
                 }
               >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="font-mono text-xs text-muted-foreground tabular">0{i + 1}</span>
-                  <Badge variant={path.emphasis ? "accent" : "outline"}>{path.stage}</Badge>
-                </div>
+                <span
+                  className={
+                    path.emphasis
+                      ? "w-fit rounded-full bg-foreground px-2.5 py-0.5 text-xs font-medium text-background"
+                      : "w-fit rounded-full border border-input px-2.5 py-0.5 text-xs font-medium"
+                  }
+                >
+                  {path.stage}
+                </span>
                 <figure className="flex items-center gap-2" aria-label={`${path.fromLabel} to ${path.toLabel}`}>
                   <span className="flex flex-col items-center gap-1 text-xs text-muted-foreground">
-                    <span className="flex size-11 items-center justify-center rounded-md border border-foreground bg-background">
+                    <span className="flex size-11 items-center justify-center rounded-md border border-border bg-card">
                       <path.from aria-hidden className="size-5 text-foreground" />
                     </span>
                     {path.fromLabel}
                   </span>
                   <span className="flex flex-1 flex-col items-center gap-1 pb-5">
                     <span className="flex w-full items-center gap-1">
-                      <span className="h-px flex-1 bg-foreground" />
-                      <path.link aria-hidden className="size-4 shrink-0 text-accent-text" />
-                      <span className="h-px flex-1 bg-foreground" />
+                      <span className="h-px flex-1 bg-foreground/40" />
+                      <path.link aria-hidden className="size-4 shrink-0" />
+                      <span className="h-px flex-1 bg-foreground/40" />
                     </span>
                     <span className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Gauge aria-hidden className="size-3" /> metered
                     </span>
                   </span>
                   <span className="flex flex-col items-center gap-1 text-xs text-muted-foreground">
-                    <span className="flex size-11 items-center justify-center rounded-md border border-foreground bg-background">
+                    <span className="flex size-11 items-center justify-center rounded-md border border-border bg-card">
                       <path.to aria-hidden className="size-5 text-foreground" />
                     </span>
                     {path.toLabel}
                   </span>
                 </figure>
-                <h3 className="font-display text-xl font-medium text-balance">{path.title}</h3>
-                <p className="text-sm text-pretty text-muted-foreground">{path.body}</p>
+                <h3 className="font-display text-xl font-bold text-balance">{path.title}</h3>
+                <p className={path.emphasis ? "text-sm text-pretty text-sun-muted" : "text-sm text-pretty text-muted-foreground"}>{path.body}</p>
               </li>
             ))}
           </ol>
@@ -308,10 +351,10 @@ export default function AboutPage() {
 
         {/* Use cases */}
         <section aria-labelledby="usecases-heading" className="flex flex-col gap-6">
-          <SectionHeading tag="Sample usage" title="Who uses Sunpool" id="usecases-heading">
+          <SectionHeading title="Who uses Sunpool" id="usecases-heading">
             <p>Proposed use cases for a Lagos pilot. These are not existing customers.</p>
           </SectionHeading>
-          <div className="overflow-x-auto rounded-lg border border-foreground">
+          <div className="overflow-x-auto rounded-lg border border-border bg-card">
             <table className="w-full min-w-[40rem] text-left text-sm">
               <caption className="sr-only">Sellers, buyers and the reason each would use Sunpool</caption>
               <thead className="bg-muted">
@@ -327,7 +370,7 @@ export default function AboutPage() {
                   <tr key={u.who} className="border-t border-rule align-top">
                     <th scope="row" className="px-4 py-3 font-medium">
                       <span className="flex items-center gap-2">
-                        <u.icon aria-hidden className="size-4 shrink-0 text-accent-text" />
+                        <u.icon aria-hidden className="size-4 shrink-0 text-muted-foreground" />
                         {u.who}
                       </span>
                     </th>
@@ -343,11 +386,11 @@ export default function AboutPage() {
 
         {/* Why not panels */}
         <section aria-labelledby="panels-heading" className="flex flex-col gap-6">
-          <SectionHeading tag="The second question" title="Why not just install your own panels?" id="panels-heading" />
+          <SectionHeading title="Why not just install your own panels?" id="panels-heading" />
           <dl className="grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
             {WHY_NOT_PANELS.map(([term, detail]) => (
-              <div key={term} className="flex flex-col gap-1 border-t border-foreground pt-3">
-                <dt className="font-medium">{term}</dt>
+              <div key={term} className="flex flex-col gap-1 border-t border-border pt-3">
+                <dt className="font-semibold">{term}</dt>
                 <dd className="text-sm text-pretty text-muted-foreground">{detail}</dd>
               </div>
             ))}
@@ -356,13 +399,13 @@ export default function AboutPage() {
 
         {/* Production path */}
         <section aria-labelledby="production-heading" className="flex flex-col gap-6">
-          <SectionHeading tag="Scaling" title="From testnet demo to production" id="production-heading">
+          <SectionHeading title="From testnet demo to production" id="production-heading">
             <p>
               The trading, settlement and double-claim protection already run on-chain. What changes for production
               is where readings come from and who operates the meters.
             </p>
           </SectionHeading>
-          <div className="overflow-x-auto rounded-lg border border-foreground">
+          <div className="overflow-x-auto rounded-lg border border-border bg-card">
             <table className="w-full min-w-[40rem] text-left text-sm">
               <caption className="sr-only">What runs today and what replaces it in production</caption>
               <thead className="bg-muted">
@@ -387,11 +430,11 @@ export default function AboutPage() {
 
         {/* Track alignment */}
         <section aria-labelledby="track-heading" className="flex flex-col gap-6">
-          <SectionHeading tag="Track alignment" title="Renewable Energy & Energy Trading" id="track-heading" />
-          <dl className="grid gap-px overflow-hidden rounded-lg border border-foreground bg-foreground sm:grid-cols-2">
+          <SectionHeading title="Renewable Energy & Energy Trading" id="track-heading" />
+          <dl className="grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2">
             {TRACK.map(([term, detail]) => (
-              <div key={term} className="flex flex-col gap-1 bg-background p-5">
-                <dt className="font-medium">{term}</dt>
+              <div key={term} className="flex flex-col gap-1 bg-card p-5">
+                <dt className="font-semibold">{term}</dt>
                 <dd className="text-sm text-pretty text-muted-foreground">{detail}</dd>
               </div>
             ))}
@@ -399,8 +442,8 @@ export default function AboutPage() {
         </section>
 
         {/* Honesty */}
-        <section aria-labelledby="honesty-heading" className="flex flex-col gap-4 rounded-lg border border-foreground bg-muted p-5 sm:p-6">
-          <h2 id="honesty-heading" className="font-display text-2xl font-medium">What is real and what is simulated</h2>
+        <section aria-labelledby="honesty-heading" className="flex flex-col gap-4 rounded-lg border border-border bg-muted p-5 sm:p-6">
+          <h2 id="honesty-heading" className="font-display text-2xl font-bold">What is real and what is simulated</h2>
           <ul className="flex list-disc flex-col gap-2 ps-5 text-sm text-pretty">
             <li>
               <strong className="font-medium">Real, on Celo Sepolia testnet:</strong> listings, USDC payments,
@@ -424,9 +467,9 @@ export default function AboutPage() {
             </li>
           </ul>
           <p className="text-sm">
-            <Link href="/" className="text-accent-text underline underline-offset-2">Try the live market</Link>
+            <Link href="/" className="font-medium underline decoration-sun decoration-2 underline-offset-4">Try the live market</Link>
             {" · "}
-            <Link href="/double-claim" className="text-accent-text underline underline-offset-2">Try a double claim</Link>
+            <Link href="/double-claim" className="font-medium underline decoration-sun decoration-2 underline-offset-4">Try a double claim</Link>
           </p>
         </section>
       </main>
