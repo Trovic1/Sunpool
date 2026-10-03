@@ -13,13 +13,15 @@ export const metadata: Metadata = {
 export default function DoubleClaimPage() {
   return (
     <>
-      <Suspense fallback={<div className="h-14 border-b border-foreground" />}>
+      <Suspense fallback={<div className="h-16 border-b border-border" />}>
         <Masthead />
       </Suspense>
       <main id="main" className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6">
         <div className="flex max-w-3xl flex-col gap-3">
-          <p className="tag">Live on Celo Sepolia</p>
-          <h1 className="font-display text-4xl leading-[1.05] font-medium tracking-tight text-balance sm:text-5xl">
+          <span className="w-fit rounded-full bg-foreground px-2.5 py-0.5 text-xs font-medium text-background">
+            Live on Celo Sepolia
+          </span>
+          <h1 className="font-display text-4xl leading-[1.02] font-bold text-balance sm:text-6xl">
             One reading, one certificate.
           </h1>
           <p className="text-pretty text-muted-foreground">
