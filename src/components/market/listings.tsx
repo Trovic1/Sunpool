@@ -1,7 +1,7 @@
 "use client"
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
-import { Plus, Store } from "lucide-react"
+import { Store } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -25,24 +25,16 @@ export function Listings({ market, onListSurplus }: { market: Market; onListSurp
   const reduced = useReducedMotion()
 
   return (
-    <section aria-labelledby="listings-heading" className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="flex flex-col gap-1">
-          <p className="tag">Buy from a neighbor</p>
-          <h2 id="listings-heading" className="font-display text-3xl font-medium tracking-tight">
-            Open listings
-          </h2>
-          <p className="max-w-prose text-sm text-pretty text-muted-foreground">
-            Each listing is backed by a meter reading that can be claimed once. The suggested fair
-            price right now is{" "}
-            <span className="font-mono text-foreground tabular">{formatPrice(suggestion.price)}</span>{" "}
-            {CURRENCY}/kWh.
-          </p>
-        </div>
-        <Button size="lg" onClick={onListSurplus}>
-          <Plus data-icon="inline-start" />
-          List surplus
-        </Button>
+    <section id="listings" aria-labelledby="listings-heading" className="flex scroll-mt-6 flex-col gap-5">
+      <div className="flex max-w-2xl flex-col gap-2">
+        <h2 id="listings-heading" className="font-display text-3xl font-bold sm:text-4xl">
+          Open listings
+        </h2>
+        <p className="text-pretty text-muted-foreground">
+          Each listing is backed by a meter reading that can be claimed once. A fair price right now is{" "}
+          <span className="font-mono font-medium text-foreground tabular">{formatPrice(suggestion.price)}</span>{" "}
+          {CURRENCY}/kWh.
+        </p>
       </div>
 
       {status === "loading" ? (
@@ -52,12 +44,12 @@ export function Listings({ market, onListSurplus }: { market: Market; onListSurp
           ))}
         </div>
       ) : listings.length === 0 ? (
-        <Empty className="border border-dashed border-foreground/40">
+        <Empty className="rounded-lg border border-dashed border-input bg-card">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <Store />
             </EmptyMedia>
-            <EmptyTitle className="font-display text-lg">No open listings</EmptyTitle>
+            <EmptyTitle className="font-display text-lg font-bold">No open listings</EmptyTitle>
             <EmptyDescription>
               Listings appear when rooftops report surplus. If you have panels, you can list first.
             </EmptyDescription>
@@ -69,7 +61,7 @@ export function Listings({ market, onListSurplus }: { market: Market; onListSurp
           </EmptyContent>
         </Empty>
       ) : (
-        <ul className="flex flex-col overflow-hidden rounded-lg border border-foreground">
+        <ul className="flex flex-col overflow-hidden rounded-lg border border-border bg-card">
           <AnimatePresence initial={false}>
             {listings.map((listing) => (
               <motion.li
@@ -79,7 +71,7 @@ export function Listings({ market, onListSurplus }: { market: Market; onListSurp
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 4 }}
                 transition={{ type: "spring", duration: 0.3, bounce: 0 }}
-                className="border-b border-rule bg-background last:border-b-0"
+                className="border-b border-border last:border-b-0"
               >
                 <ListingRow listing={listing} account={market.account} onBuy={() => market.buy(listing)} />
               </motion.li>
@@ -116,7 +108,7 @@ function ListingRow({
       : undefined
 
   return (
-    <article className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 p-4 sm:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))_auto]">
+    <article className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-3 p-4 sm:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))_auto] sm:px-5">
       <div className="flex min-w-0 flex-col gap-0.5">
         <p className="flex items-center gap-2 font-medium">
           <span className={cn("truncate", sellerName.startsWith("0x") && "font-mono text-[0.9375rem]")} title={listing.sellerId}>
@@ -133,11 +125,10 @@ function ListingRow({
         <p className="text-xs text-pretty text-muted-foreground">
           {house ? (
             <>
-              {house.street} · {house.panelKw} kW rooftop
+              {house.street}, {house.panelKw} kW rooftop
               {listing.untilMinute !== undefined && (
                 <>
-                  {" "}
-                  · until <span className="font-mono tabular">{minuteLabel(listing.untilMinute)}</span>
+                  , until <span className="font-mono tabular">{minuteLabel(listing.untilMinute)}</span>
                 </>
               )}
             </>
@@ -147,7 +138,7 @@ function ListingRow({
               {listedAt && (
                 <>
                   {" "}
-                  · listed <span className="font-mono tabular">{listedAt}</span> WAT
+                  , listed <span className="font-mono tabular">{listedAt}</span> WAT
                 </>
               )}
             </>
@@ -175,7 +166,7 @@ function ListingRow({
 
       <div className="col-start-2 row-start-1 sm:col-start-5">
         <Button
-          variant="outline"
+          variant={listing.pending || own ? "outline" : "default"}
           onClick={onBuy}
           disabled={listing.pending || own}
           aria-label={

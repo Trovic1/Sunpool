@@ -63,7 +63,7 @@ export function ListSurplusDialog({ market, open, onOpenChange }: Props) {
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="font-display text-2xl font-medium">{title}</DialogTitle>
+            <DialogTitle className="font-display text-2xl font-bold">{title}</DialogTitle>
             <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
           {open && <ListSurplusForm market={market} onDone={() => onOpenChange(false)} Footer={DialogFooter} />}
@@ -76,7 +76,7 @@ export function ListSurplusDialog({ market, open, onOpenChange }: Props) {
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent>
         <DrawerHeader className="text-left">
-          <DrawerTitle className="font-display text-2xl font-medium">{title}</DrawerTitle>
+          <DrawerTitle className="font-display text-2xl font-bold">{title}</DrawerTitle>
           <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
         <div className="px-4">
@@ -189,7 +189,7 @@ function ListSurplusForm({
             <FieldDescription id={`${id}-price-help`}>
               Buyers pay{" "}
               <span className="font-mono tabular">
-                {Number.isFinite(Number(kwh) * Number(price)) ? (Number(kwh) * Number(price)).toFixed(2) : "—"}
+                {Number.isFinite(Number(kwh) * Number(price)) ? (Number(kwh) * Number(price)).toFixed(2) : "-"}
               </span>{" "}
               {CURRENCY} in total.
             </FieldDescription>

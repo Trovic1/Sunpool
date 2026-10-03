@@ -43,7 +43,7 @@ export function GenerationChart({ market }: { market: Market }) {
   return (
     <Card className="gap-3">
       <CardHeader>
-        <CardTitle className="font-display text-xl font-medium">Today&rsquo;s generation</CardTitle>
+        <CardTitle className="font-display text-xl font-bold">Today&rsquo;s generation</CardTitle>
         <CardDescription>
           All {Math.round(TOTAL_PANEL_KW)} kW of rooftops in {NEIGHBORHOOD.name}, in kW. Simulated
           meter readings against the forecast.
@@ -53,7 +53,7 @@ export function GenerationChart({ market }: { market: Market }) {
       <CardContent className="flex flex-col gap-3">
         <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground" aria-label="Legend">
           <li className="flex items-center gap-1.5">
-            <span aria-hidden className="h-0.5 w-4 rounded-full bg-chart-actual" />
+            <span aria-hidden className="h-2.5 w-4 rounded-xs border-t-2 border-chart-actual bg-sun" />
             Metered (simulated)
           </li>
           <li className="flex items-center gap-1.5">
@@ -115,21 +115,26 @@ export function GenerationChart({ market }: { market: Market }) {
                 />
                 <Line
                   dataKey="forecast"
+                  type="monotone"
                   stroke="var(--chart-forecast)"
                   strokeWidth={1.5}
                   strokeDasharray="4 4"
                   dot={false}
-                  activeDot={{ r: 4, fill: "var(--chart-forecast)", stroke: "var(--background)", strokeWidth: 2 }}
+                  activeDot={{ r: 4, fill: "var(--chart-forecast)", stroke: "var(--card)", strokeWidth: 2 }}
                   isAnimationActive={false}
                 />
-                <Line
+                {/* Signature move: metered solar is a sun-yellow area under an ink line. */}
+                <Area
                   dataKey="actual"
+                  type="monotone"
                   stroke="var(--chart-actual)"
                   strokeWidth={2}
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  fill="var(--sun)"
+                  fillOpacity={1}
                   dot={false}
-                  activeDot={{ r: 4, fill: "var(--chart-actual)", stroke: "var(--background)", strokeWidth: 2 }}
+                  activeDot={{ r: 4, fill: "var(--chart-actual)", stroke: "var(--card)", strokeWidth: 2 }}
                   connectNulls={false}
                   isAnimationActive={false}
                 />
@@ -163,7 +168,7 @@ export function GenerationChart({ market }: { market: Market }) {
             <div className="flex flex-col">
               <dt className="tag">Expected rest of day</dt>
               <dd className="font-mono tabular">
-                {formatKwh(remainingLow, 0)}&ndash;{formatKwh(remainingHigh, 0)} kWh
+                {formatKwh(remainingLow, 0)}-{formatKwh(remainingHigh, 0)} kWh
               </dd>
             </div>
             <div className="col-span-2 flex flex-col sm:col-span-1">
@@ -193,7 +198,7 @@ function ChartTooltip({ active, payload }: TooltipContentProps) {
   if (!active || !payload?.length) return null
   const point = payload[0].payload as GenerationPoint
   return (
-    <div className="flex min-w-40 flex-col gap-1 rounded-md border border-foreground bg-background px-3 py-2 text-xs shadow-offset">
+    <div className="flex min-w-40 flex-col gap-1 rounded-md border border-border bg-popover px-3 py-2 text-xs shadow-float">
       <p className="font-mono font-medium tabular">{point.label} WAT</p>
       {point.actual !== undefined && (
         <p className="flex justify-between gap-4">
@@ -209,7 +214,7 @@ function ChartTooltip({ active, payload }: TooltipContentProps) {
         <p className="flex justify-between gap-4">
           <span className="text-muted-foreground">Band</span>
           <span className="font-mono tabular">
-            {point.band[0].toFixed(1)}&ndash;{point.band[1].toFixed(1)} kW
+            {point.band[0].toFixed(1)}-{point.band[1].toFixed(1)} kW
           </span>
         </p>
       )}
@@ -235,10 +240,10 @@ function DataTable({ points }: { points: GenerationPoint[] }) {
           {hourly.map((p) => (
             <tr key={p.minute} className="border-t border-rule">
               <th scope="row" className="px-3 py-1 font-normal">{p.label}</th>
-              <td className="px-3 py-1 text-end">{p.actual?.toFixed(1) ?? "—"}</td>
+              <td className="px-3 py-1 text-end">{p.actual?.toFixed(1) ?? "-"}</td>
               <td className="px-3 py-1 text-end">{p.forecast.toFixed(1)}</td>
               <td className="px-3 py-1 text-end">
-                {p.band && p.actual === undefined ? `${p.band[0].toFixed(1)}–${p.band[1].toFixed(1)}` : "—"}
+                {p.band && p.actual === undefined ? `${p.band[0].toFixed(1)}-${p.band[1].toFixed(1)}` : "-"}
               </td>
             </tr>
           ))}
