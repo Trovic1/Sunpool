@@ -89,14 +89,17 @@ export function ListSurplusDialog({ market, open, onOpenChange }: Props) {
 
 type Errors = { kwh?: string; price?: string }
 
-function ListSurplusForm({
+export function ListSurplusForm({
   market,
   onDone,
   Footer,
+  compact = false,
 }: {
   market: Market
   onDone: () => void
   Footer: React.ComponentType<React.ComponentProps<"div">>
+  /** Inline on the Sell tab: one-line price hint, full-width submit. */
+  compact?: boolean
 }) {
   const id = useId()
   const available = availableSurplus(market)
@@ -197,29 +200,46 @@ function ListSurplusForm({
         </Field>
       </FieldGroup>
 
-      <aside className="flex flex-col gap-2 rounded-md border border-rule bg-muted p-3 text-sm">
-        <p className="flex items-center gap-1.5 font-medium">
+      {compact ? (
+        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
           <Sparkles aria-hidden className="size-4 text-accent-text" />
-          Suggested price:{" "}
-          <span className="font-mono tabular">{formatPrice(suggestion.price)}</span> {CURRENCY}/kWh
+          Fair price now <span className="font-mono text-foreground tabular">{formatPrice(suggestion.price)}</span>
+          {Number(price) !== suggestion.price && (
+            <Button type="button" variant="link" size="sm" className="h-auto px-0" onClick={() => setPrice(suggestion.price.toFixed(3))}>
+              Use it
+            </Button>
+          )}
         </p>
-        <p className="text-muted-foreground">{suggestion.reason}</p>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="w-fit"
-          onClick={() => setPrice(suggestion.price.toFixed(3))}
-          disabled={Number(price) === suggestion.price}
-        >
-          {Number(price) === suggestion.price ? "Suggestion applied" : "Use suggested price"}
-        </Button>
-      </aside>
+      ) : (
+        <aside className="flex flex-col gap-2 rounded-md border border-rule bg-muted p-3 text-sm">
+          <p className="flex items-center gap-1.5 font-medium">
+            <Sparkles aria-hidden className="size-4 text-accent-text" />
+            Suggested price:{" "}
+            <span className="font-mono tabular">{formatPrice(suggestion.price)}</span> {CURRENCY}/kWh
+          </p>
+          <p className="text-muted-foreground">{suggestion.reason}</p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="w-fit"
+            onClick={() => setPrice(suggestion.price.toFixed(3))}
+            disabled={Number(price) === suggestion.price}
+          >
+            {Number(price) === suggestion.price ? "Suggestion applied" : "Use suggested price"}
+          </Button>
+        </aside>
+      )}
 
       <Footer className="px-0 sm:px-0">
-        <Button type="submit" size="lg" disabled={submitting} className="w-full sm:w-auto">
+        <Button
+          type="submit"
+          size="lg"
+          disabled={submitting}
+          className={compact ? "h-14 w-full rounded-2xl font-display text-lg font-bold" : "w-full sm:w-auto"}
+        >
           {submitting && <Spinner data-icon="inline-start" />}
-          {submitting ? "Listing…" : "List surplus"}
+          {submitting ? "Listing…" : compact ? "List for sale" : "List surplus"}
         </Button>
       </Footer>
     </form>

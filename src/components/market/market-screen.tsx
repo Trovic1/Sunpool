@@ -1,24 +1,18 @@
 "use client"
 
-import { Plus } from "lucide-react"
 import { useQueryState } from "nuqs"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 
-import { Button } from "@/components/ui/button"
 import type { MarketModel } from "@/hooks/market-types"
 import { useChainMarket } from "@/hooks/use-chain-market"
 import { useDataSource } from "@/hooks/use-data-source"
 import { useMarket } from "@/hooks/use-market"
-import { minuteLabel } from "@/lib/format"
+import { formatKwh, minuteLabel } from "@/lib/format"
 import { NEIGHBORHOOD } from "@/lib/seed"
 
-import { Counters } from "./counters"
-import { GenerationChart } from "./generation-chart"
-import { ListSurplusDialog } from "./list-surplus-dialog"
-import { Listings } from "./listings"
+import { HowItWorks } from "./how-it-works"
 import { ScenarioSwitch } from "./scenario-switch"
-import { TradeTape } from "./trade-tape"
-import { VerifyStrip } from "./verify-strip"
+import { TradePanel } from "./trade-panel"
 
 export function MarketScreen() {
   const source = useDataSource()
@@ -40,73 +34,49 @@ function SeededMarket() {
 
 function MarketView({ market }: { market: MarketModel }) {
   const chain = market.mode === "chain"
-  const [listOpen, setListOpen] = useState(false)
+  const { totals } = market
 
   return (
-    <main id="main" className="flex w-full flex-col">
-      {/* Sun band: the one coloured field. Everything on it is ink. */}
-      <section aria-labelledby="market-heading" className="bg-sun text-sun-foreground">
-        <div className="mx-auto grid w-full max-w-7xl gap-8 px-4 py-8 sm:px-6 sm:py-10 lg:grid-cols-12 lg:items-end lg:gap-10">
-          <div className="flex flex-col gap-4 lg:col-span-7">
-            <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-medium text-sun-muted">
-              <span>
-                {NEIGHBORHOOD.name}, {NEIGHBORHOOD.city}
-              </span>
-              <span className="font-mono tabular">
-                {minuteLabel(market.minute)} {NEIGHBORHOOD.timezone}
-              </span>
-              <span className="rounded-full bg-foreground px-2 py-0.5 text-xs text-background sm:hidden">
-                {chain ? "Celo Sepolia testnet" : "Simulated data"}
-              </span>
-            </p>
-            <h1
-              id="market-heading"
-              className="font-display text-4xl leading-[1.02] font-bold text-balance sm:text-5xl xl:text-6xl"
-            >
-              Your neighbor&rsquo;s rooftop is your power plant.
-            </h1>
-            <p className="max-w-md text-pretty text-sun-muted">
-              Buy surplus solar from the house next door. Every kWh is backed by one meter reading, certified
-              once.
-            </p>
-            <div className="flex flex-wrap items-center gap-3 pt-1">
-              <Button variant="ink" size="lg" onClick={() => setListOpen(true)}>
-                <Plus data-icon="inline-start" />
-                List surplus
-              </Button>
-              <Button asChild variant="ghost" size="lg" className="hover:bg-foreground/10">
-                <a href="#listings">Browse listings</a>
-              </Button>
-            </div>
-          </div>
-          <div className="lg:col-span-5">
-            <Counters market={market} />
-          </div>
+    <main id="main" className="mx-auto flex w-full max-w-6xl flex-col gap-20 px-4 py-8 sm:px-6 sm:py-14">
+      <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+        <div className="flex flex-col gap-6">
+          <p className="w-fit rounded-full border border-border px-3 py-1 text-sm text-muted-foreground">
+            {NEIGHBORHOOD.name}, {NEIGHBORHOOD.city}
+            <span className="ms-2 font-mono tabular">
+              {minuteLabel(market.minute)} {NEIGHBORHOOD.timezone}
+            </span>
+          </p>
+          <h1 id="market-heading" className="font-display text-[2.75rem] leading-[0.95] font-extrabold sm:text-6xl lg:text-7xl">
+            Prepaid power from your <span className="text-accent-text">neighbour&rsquo;s roof.</span>
+          </h1>
+          <p className="max-w-md text-lg text-pretty text-muted-foreground">
+            Load solar units from the house next door. Cheaper than a generator, paid from your phone.
+          </p>
+          <dl className="flex flex-wrap gap-x-8 gap-y-3 pt-2">
+            <Stat label={chain ? "Traded on Celo" : "Traded today"} value={`${formatKwh(totals.kwh)} kWh`} />
+            <Stat label="Certificates" value={String(totals.certificates)} />
+            <Stat label="CO₂ avoided (est.)" value={`${formatKwh(totals.co2Kg)} kg`} />
+          </dl>
         </div>
-      </section>
-
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-14 px-4 py-8 sm:px-6 sm:py-10">
-        {!chain && (
-          <div className="-mb-8 flex justify-end">
-            <ScenarioSwitch market={market} />
-          </div>
-        )}
-
-        <div className="grid gap-4 lg:grid-cols-12">
-          <div className="lg:col-span-8">
-            <GenerationChart market={market} />
-          </div>
-          <div className="lg:col-span-4">
-            <TradeTape market={market} onListSurplus={() => setListOpen(true)} />
-          </div>
-        </div>
-
-        <Listings market={market} onListSurplus={() => setListOpen(true)} />
-
-        <VerifyStrip />
+        <TradePanel market={market} />
       </div>
 
-      <ListSurplusDialog market={market} open={listOpen} onOpenChange={setListOpen} />
+      <HowItWorks />
+
+      {!chain && (
+        <div className="flex justify-center">
+          <ScenarioSwitch market={market} />
+        </div>
+      )}
     </main>
+  )
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-col">
+      <dt className="text-sm text-muted-foreground">{label}</dt>
+      <dd className="font-mono text-xl font-semibold tabular">{value}</dd>
+    </div>
   )
 }
