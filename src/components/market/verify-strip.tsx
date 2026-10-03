@@ -21,33 +21,35 @@ const STEPS = [
 
 export function VerifyStrip() {
   return (
-    <section aria-labelledby="verify-heading" className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <p className="tag">Why the numbers add up</p>
-        <h2 id="verify-heading" className="font-display text-3xl font-medium tracking-tight">
+    <section aria-labelledby="verify-heading" className="grid gap-8 lg:grid-cols-12">
+      <div className="flex flex-col gap-3 lg:col-span-4">
+        <h2 id="verify-heading" className="font-display text-3xl font-bold text-balance sm:text-4xl">
           How a trade is verified
         </h2>
+        <p className="text-pretty text-muted-foreground">
+          The reading and the payment run on Celo Sepolia. The meter is simulated until certified hardware
+          signs readings.
+        </p>
+        <Link
+          href="/double-claim"
+          className="w-fit font-medium underline decoration-sun decoration-2 underline-offset-4 hover:decoration-foreground"
+        >
+          Try claiming the same reading twice
+        </Link>
       </div>
-      <ol className="grid gap-px overflow-hidden rounded-lg border border-foreground bg-foreground md:grid-cols-3">
-        {STEPS.map((step, i) => (
-          <li key={step.title} className="flex flex-col gap-2 bg-background p-5">
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-xs text-muted-foreground tabular">0{i + 1}</span>
-              <step.icon aria-hidden className="size-4 text-accent-text" />
+      <ol className="flex flex-col divide-y divide-border rounded-lg border border-border bg-card lg:col-span-8">
+        {STEPS.map((step) => (
+          <li key={step.title} className="flex gap-4 p-5">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-sun text-sun-foreground">
+              <step.icon aria-hidden className="size-5" />
+            </span>
+            <div className="flex flex-col gap-1">
+              <h3 className="font-semibold">{step.title}</h3>
+              <p className="text-sm text-pretty text-muted-foreground">{step.body}</p>
             </div>
-            <h3 className="font-medium">{step.title}</h3>
-            <p className="text-sm text-pretty text-muted-foreground">{step.body}</p>
           </li>
         ))}
       </ol>
-      <p className="text-sm text-pretty text-muted-foreground">
-        Steps two and three run on Celo Sepolia. The meter in step one is simulated until certified
-        hardware signs readings.{" "}
-        <Link href="/double-claim" className="text-accent-text underline underline-offset-2">
-          Try claiming the same reading twice
-        </Link>
-        .
-      </p>
     </section>
   )
 }
