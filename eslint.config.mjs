@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     "artifacts/**",
     "cache/**",
     "types/**",
+    // Local dot folders (editor and tool caches).
+    ".*/**",
   ]),
 ]);
 
