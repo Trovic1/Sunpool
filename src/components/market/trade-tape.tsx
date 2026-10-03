@@ -147,9 +147,9 @@ function TapeList({ trades, account }: { trades: MarketTrade[]; account?: string
               initial={
                 reduced
                   ? { opacity: 0 }
-                  : { opacity: 0, y: -12, backgroundColor: "rgba(242, 183, 5, 0.32)" }
+                  : { opacity: 0, y: -12, backgroundColor: "rgba(200, 242, 90, 0.22)" }
               }
-              animate={{ opacity: 1, y: 0, backgroundColor: "rgba(242, 183, 5, 0)" }}
+              animate={{ opacity: 1, y: 0, backgroundColor: "rgba(200, 242, 90, 0)" }}
               exit={{ opacity: 0, y: 4 }}
               transition={{
                 type: "spring",
