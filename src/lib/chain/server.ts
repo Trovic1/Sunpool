@@ -62,11 +62,25 @@ const cache: { scannedTo: bigint; trades: ChainTrade[]; blockTimes: Map<bigint, 
   blockTimes: new Map(),
 }
 
-async function blockTime(blockNumber: bigint) {
+/**
+ * Celo is an OP-stack L2 with fixed one-second blocks (checked against Forno: a block
+ * 9,000 behind head is exactly 9,000 s older). Forno only serves eth_getBlockByNumber
+ * for roughly the last 10,000 blocks, so older timestamps are derived from the head.
+ */
+const BLOCK_TIME_SECONDS = 1n
+const head: { number: bigint; timestamp: bigint } = { number: 0n, timestamp: 0n }
+
+async function refreshHead() {
+  const block = await publicClient.getBlock({ blockTag: "latest" })
+  head.number = block.number
+  head.timestamp = block.timestamp
+  return block.number
+}
+
+function blockTime(blockNumber: bigint) {
   const cached = cache.blockTimes.get(blockNumber)
   if (cached !== undefined) return cached
-  const block = await publicClient.getBlock({ blockNumber })
-  const ts = Number(block.timestamp)
+  const ts = Number(head.timestamp - (head.number - blockNumber) * BLOCK_TIME_SECONDS)
   cache.blockTimes.set(blockNumber, ts)
   return ts
 }
@@ -96,7 +110,7 @@ async function scanTrades(head: bigint) {
         certificateId: a.certificateId!.toString(),
         txHash: log.transactionHash!,
         blockNumber: log.blockNumber!.toString(),
-        timestamp: await blockTime(log.blockNumber!),
+        timestamp: blockTime(log.blockNumber!),
       })
     }
     cache.trades.push(...batch)
@@ -143,8 +157,8 @@ export function getMarketSnapshot() {
   // Collapse concurrent polls into one RPC round trip.
   inflight ??= (async () => {
     try {
-      const head = await publicClient.getBlockNumber()
-      const [listings] = await Promise.all([readListings(), scanTrades(head)])
+      const headNumber = await refreshHead()
+      const [listings] = await Promise.all([readListings(), scanTrades(headNumber)])
       const trades = [...cache.trades].sort((a, b) => b.timestamp - a.timestamp)
       return {
         listings,
@@ -155,7 +169,7 @@ export function getMarketSnapshot() {
           certificates: trades.length,
           trades: trades.length,
         },
-        headBlock: head.toString(),
+        headBlock: headNumber.toString(),
         updatedAt: Date.now(),
       }
     } finally {
