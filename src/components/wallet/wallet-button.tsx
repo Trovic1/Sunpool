@@ -16,7 +16,7 @@ import { shortAddress } from "@/lib/format"
 
 const fmt = (value: bigint | undefined, decimals: number, digits = 2) =>
   value === undefined
-    ? "—"
+    ? "-"
     : Number(formatUnits(value, decimals)).toLocaleString("en-US", {
         minimumFractionDigits: digits,
         maximumFractionDigits: digits,
