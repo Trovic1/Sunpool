@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next"
-import { Fraunces, Geist, JetBrains_Mono } from "next/font/google"
+import { Bricolage_Grotesque, Geist, JetBrains_Mono } from "next/font/google"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 
 import { Providers } from "@/components/providers"
@@ -7,8 +7,8 @@ import { Toaster } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import "./globals.css"
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-bricolage",
   subsets: ["latin"],
   axes: ["opsz"],
 })
@@ -30,14 +30,14 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#faf9f6",
+  themeColor: "#f7f7f4",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${geist.variable} ${jetbrainsMono.variable} antialiased`}
+      className={`${bricolage.variable} ${geist.variable} ${jetbrainsMono.variable} antialiased`}
     >
       <body className="flex min-h-dvh flex-col">
         <Providers>
