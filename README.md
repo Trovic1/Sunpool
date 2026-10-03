@@ -93,5 +93,5 @@ Next.js (App Router) · TypeScript · Hardhat 3 + viem · OpenZeppelin 5 · Tail
 
 ## Docs
 
-- [`docs/PRD.md`](docs/PRD.md): design PRD and Warm Editorial brand
+- [`docs/PRD.md`](docs/PRD.md): design PRD and Lagos daylight brand
 - [`docs/SUBMISSION.md`](docs/SUBMISSION.md): running Devpost write-up
