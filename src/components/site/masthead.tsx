@@ -13,8 +13,9 @@ import { cn } from "@/lib/utils"
 
 const NAV = [
   { href: "/", label: "Market" },
-  { href: "/double-claim", label: "Double-claim test" },
-  { href: "/about", label: "About & impact" },
+  { href: "/activity", label: "Activity" },
+  { href: "/double-claim", label: "Proof" },
+  { href: "/about", label: "About" },
 ] as const
 
 function NavLinks({ className }: { className?: string }) {
@@ -30,7 +31,7 @@ function NavLinks({ className }: { className?: string }) {
               aria-current={active ? "page" : undefined}
               className={cn(
                 "inline-flex h-9 items-center rounded-full px-3 font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
-                active && "bg-foreground text-background hover:bg-foreground hover:text-background",
+                active && "bg-accent text-foreground hover:bg-accent",
               )}
             >
               {item.label}
@@ -45,8 +46,8 @@ function NavLinks({ className }: { className?: string }) {
 export function Masthead() {
   const source = useDataSource()
   return (
-    <header className="border-b border-border bg-background">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+    <header className="bg-background">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2 rounded-sm" aria-label="Sunpool, market home">
             <span className="flex size-8 items-center justify-center rounded-full bg-sun text-sun-foreground">
@@ -61,7 +62,7 @@ export function Masthead() {
 
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="hidden sm:inline-flex">
-            {source === "chain" ? "Celo Sepolia testnet" : "Simulated data"}
+            {source === "chain" ? "Testnet" : "Demo data"}
           </Badge>
           {source === "chain" ? (
             <WalletButton />
@@ -80,8 +81,8 @@ export function Masthead() {
           )}
         </div>
       </div>
-      <nav aria-label="Main" className="border-t border-border md:hidden">
-        <NavLinks className="overflow-x-auto px-3 py-2" />
+      <nav aria-label="Main" className="md:hidden">
+        <NavLinks className="overflow-x-auto px-3 pb-2" />
       </nav>
     </header>
   )
