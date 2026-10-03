@@ -5,7 +5,7 @@ import { EMISSION_FACTOR } from "@/lib/seed"
 
 export function SiteFooter() {
   return (
-    <footer className="mt-auto border-t border-foreground">
+    <footer className="mt-auto border-t border-border bg-card">
       <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-sm text-muted-foreground sm:px-6">
         <p className="text-pretty">
           <strong className="font-medium text-foreground">Meter data is simulated.</strong> A server-side
@@ -55,7 +55,7 @@ export function SiteFooter() {
             Double-claim test
           </Link>
         </p>
-        <p className="tag pt-2">Sunpool · IEEE ClimateChain Global Hackathon 2026 · Built on Celo</p>
+        <p className="pt-2 text-xs text-muted-foreground">Sunpool, IEEE ClimateChain Global Hackathon 2026. Built on Celo.</p>
       </div>
     </footer>
   )
