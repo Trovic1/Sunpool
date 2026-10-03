@@ -13,7 +13,7 @@ export default function MarketPage() {
       >
         Skip to content
       </a>
-      <Suspense fallback={<div className="h-14 border-b border-foreground" />}>
+      <Suspense fallback={<div className="h-16 border-b border-border" />}>
         <Masthead />
       </Suspense>
       <Suspense>

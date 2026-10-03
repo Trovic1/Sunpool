@@ -1,10 +1,10 @@
 "use client"
 
-import { motion, useReducedMotion, type Variants } from "framer-motion"
+import { Plus } from "lucide-react"
 import { useQueryState } from "nuqs"
 import { useEffect, useState } from "react"
 
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import type { MarketModel } from "@/hooks/market-types"
 import { useChainMarket } from "@/hooks/use-chain-market"
 import { useDataSource } from "@/hooks/use-data-source"
@@ -41,69 +41,72 @@ function SeededMarket() {
 function MarketView({ market }: { market: MarketModel }) {
   const chain = market.mode === "chain"
   const [listOpen, setListOpen] = useState(false)
-  const reduced = useReducedMotion()
-
-  const item: Variants = reduced
-    ? { hidden: { opacity: 0 }, show: { opacity: 1 } }
-    : {
-        hidden: { opacity: 0, y: 8 },
-        show: { opacity: 1, y: 0, transition: { type: "spring", duration: 0.45, bounce: 0 } },
-      }
 
   return (
-    <motion.main
-      id="main"
-      initial="hidden"
-      animate="show"
-      variants={{ show: { transition: { staggerChildren: 0.1 } } }}
-      className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 py-6 sm:px-6 sm:py-8"
-    >
-      <div className="flex flex-col gap-5">
-        <motion.div variants={item} className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
-          <div className="flex flex-col gap-2">
-            <p className="flex flex-wrap items-center gap-2 tag">
+    <main id="main" className="flex w-full flex-col">
+      {/* Sun band: the one coloured field. Everything on it is ink. */}
+      <section aria-labelledby="market-heading" className="bg-sun text-sun-foreground">
+        <div className="mx-auto grid w-full max-w-7xl gap-8 px-4 py-8 sm:px-6 sm:py-10 lg:grid-cols-12 lg:items-end lg:gap-10">
+          <div className="flex flex-col gap-4 lg:col-span-7">
+            <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-medium text-sun-muted">
               <span>
                 {NEIGHBORHOOD.name}, {NEIGHBORHOOD.city}
               </span>
-              <span aria-hidden>·</span>
               <span className="font-mono tabular">
                 {minuteLabel(market.minute)} {NEIGHBORHOOD.timezone}
               </span>
-              <Badge variant="outline" className="normal-case tracking-normal sm:hidden">
+              <span className="rounded-full bg-foreground px-2 py-0.5 text-xs text-background sm:hidden">
                 {chain ? "Celo Sepolia testnet" : "Simulated data"}
-              </Badge>
+              </span>
             </p>
-            <h1 className="font-display text-4xl leading-[1.05] font-medium tracking-tight sm:text-5xl">
+            <h1
+              id="market-heading"
+              className="font-display text-4xl leading-[1.02] font-bold text-balance sm:text-5xl xl:text-6xl"
+            >
               Your neighbor&rsquo;s rooftop is your power plant.
             </h1>
+            <p className="max-w-md text-pretty text-sun-muted">
+              Buy surplus solar from the house next door. Every kWh is backed by one meter reading, certified
+              once.
+            </p>
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              <Button variant="ink" size="lg" onClick={() => setListOpen(true)}>
+                <Plus data-icon="inline-start" />
+                List surplus
+              </Button>
+              <Button asChild variant="ghost" size="lg" className="hover:bg-foreground/10">
+                <a href="#listings">Browse listings</a>
+              </Button>
+            </div>
           </div>
-          {!chain && <ScenarioSwitch market={market} />}
-        </motion.div>
+          <div className="lg:col-span-5">
+            <Counters market={market} />
+          </div>
+        </div>
+      </section>
+
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-14 px-4 py-8 sm:px-6 sm:py-10">
+        {!chain && (
+          <div className="-mb-8 flex justify-end">
+            <ScenarioSwitch market={market} />
+          </div>
+        )}
 
         <div className="grid gap-4 lg:grid-cols-12">
-          <div className="flex flex-col gap-4 lg:col-span-8">
-            <motion.div variants={item}>
-              <Counters market={market} />
-            </motion.div>
-            <motion.div variants={item}>
-              <GenerationChart market={market} />
-            </motion.div>
+          <div className="lg:col-span-8">
+            <GenerationChart market={market} />
           </div>
-          <motion.div variants={item} className="lg:col-span-4">
+          <div className="lg:col-span-4">
             <TradeTape market={market} onListSurplus={() => setListOpen(true)} />
-          </motion.div>
+          </div>
         </div>
+
+        <Listings market={market} onListSurplus={() => setListOpen(true)} />
+
+        <VerifyStrip />
       </div>
 
-      <motion.div variants={item}>
-        <Listings market={market} onListSurplus={() => setListOpen(true)} />
-      </motion.div>
-
-      <motion.div variants={item}>
-        <VerifyStrip />
-      </motion.div>
-
       <ListSurplusDialog market={market} open={listOpen} onOpenChange={setListOpen} />
-    </motion.main>
+    </main>
   )
 }

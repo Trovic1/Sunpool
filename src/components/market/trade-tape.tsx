@@ -33,8 +33,8 @@ export function TradeTape({ market, onListSurplus }: { market: Market; onListSur
 
   return (
     <Card className="h-full min-h-0 gap-0 pb-0">
-      <CardHeader className="border-b border-foreground pb-3">
-        <CardTitle className="flex items-center gap-2 font-display text-xl font-medium">
+      <CardHeader className="border-b border-border pb-3">
+        <CardTitle className="flex items-center gap-2 font-display text-xl font-bold">
           <h2>Trade tape</h2>
           <LiveIndicator live={isLive && !paused} paused={isLive && paused} />
         </CardTitle>
@@ -89,7 +89,7 @@ export function TradeTape({ market, onListSurplus }: { market: Market; onListSur
               <EmptyMedia variant="icon">
                 <Sunrise />
               </EmptyMedia>
-              <EmptyTitle className="font-display text-lg">
+              <EmptyTitle className="font-display text-lg font-bold">
                 {chain ? "No trades settled yet" : "No trades yet today"}
               </EmptyTitle>
               <EmptyDescription>
@@ -122,7 +122,7 @@ function LiveIndicator({ live, paused }: { live: boolean; paused: boolean }) {
         aria-hidden
         className={cn(
           "size-1.5 rounded-full",
-          live ? "bg-primary motion-safe:animate-pulse" : "bg-muted-foreground",
+          live ? "bg-foreground motion-safe:animate-pulse" : "bg-muted-foreground",
         )}
       />
       {live ? "Live" : "Paused"}
@@ -147,9 +147,9 @@ function TapeList({ trades, account }: { trades: MarketTrade[]; account?: string
               initial={
                 reduced
                   ? { opacity: 0 }
-                  : { opacity: 0, y: -12, backgroundColor: "rgba(253, 238, 228, 1)" }
+                  : { opacity: 0, y: -12, backgroundColor: "rgba(242, 183, 5, 0.32)" }
               }
-              animate={{ opacity: 1, y: 0, backgroundColor: "rgba(253, 238, 228, 0)" }}
+              animate={{ opacity: 1, y: 0, backgroundColor: "rgba(242, 183, 5, 0)" }}
               exit={{ opacity: 0, y: 4 }}
               transition={{
                 type: "spring",
@@ -166,7 +166,7 @@ function TapeList({ trades, account }: { trades: MarketTrade[]; account?: string
       </ol>
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-background to-transparent"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-card to-transparent"
       />
     </div>
   )
