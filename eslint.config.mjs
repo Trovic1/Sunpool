@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     "artifacts/**",
     "cache/**",
     "types/**",
+    // Installed agent skills (third-party scripts).
+    ".claude/**",
   ]),
 ]);
 
