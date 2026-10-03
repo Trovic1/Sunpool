@@ -78,18 +78,18 @@ Design skills come from the `designb` workflow. Before any UI work, read the ins
 - The forecast chart shows a confidence band. Do not present it as exact.
 - Do not invent testimonials, partners, or user numbers.
 
-## Design direction: Lagos daylight
+## Design direction: Deep forest
 
-Brand: calm, trustworthy, sunlit, civic. Not crypto-bro. Personality: warm, precise, quietly confident. Replaced Warm Editorial on 2026-10-03; full contract in `docs/DESIGN_DIRECTION.md`, tokens in `DESIGN.md`.
+Brand: calm, trustworthy, civic, and simple enough to use without reading. Personality: warm, precise, quietly confident. Chosen 2026-10-03 (replaced Lagos daylight, which replaced Warm Editorial). Tokens in `DESIGN.md`.
 
-- **Background:** cool off-white `#f7f7f4`, raised panels white. Text: near-black ink `#111214`.
-- **Accent (only one):** sun yellow `#f2b705`, used only as a filled area (band, buttons, metered chart area, badges) with ink on top. Never yellow text or thin yellow lines on the light ground.
-- **Borders:** ink hairlines at ~13%, 8px control radius, 12px panel radius, pills only for status. No offset shadows; only floating layers (popover, dialog, tooltip) get a soft shadow.
-- **Type:** Bricolage Grotesque for headings, Geist for UI and body, **JetBrains Mono** for kWh, prices, addresses, and tx hashes.
-- **Hierarchy:** big bold headings and big mono numbers; no eyebrow labels, no 01/02/03 numbering, no em-dashes in UI copy.
-- **Signature move:** sun fill. Anything that is solar energy is drawn as a yellow filled area.
+- **Concept:** "Prepaid power from your neighbour's roof." Users load kWh from a neighbour like prepaid units; a smart meter on a shared line delivers them. DisCo prepaid units are never resold.
+- **Background:** dark forest `#0c1f18`, cards `#13291f`. Text: mist `#eef5ef`, muted `#9db3a6`.
+- **Accent (only one):** lime `#c8f25a` for the primary action, solar energy drawn as a filled area, and one highlighted phrase per headline.
+- **Minimal:** one big number and one action per view. Detail (charts, trade tape, contract info) goes on secondary pages. Short sentences; no paragraphs on the home screen.
+- **Surfaces:** large radius cards, 10% hairlines, no shadows except floating layers.
+- **Type:** Bricolage Grotesque (extra bold) for headlines, Geist for UI and body, **JetBrains Mono** for kWh, prices, addresses, and tx hashes.
 - **Motion:** fast springs, staggered enters, a live trade tape that slides in new rows, numbers that count up. Purposeful only.
-- **Above the fold:** live neighborhood trade tape + today's generation curve with forecast overlay + the "kWh traded / certificates minted / CO2 avoided (est.)" counters.
+- **Above the fold:** the Buy/Sell panel with solar for sale now, a small sun curve, and the "kWh traded / certificates / CO2 avoided (est.)" totals. Full chart and trade tape on /activity.
 
 Banned: indigo-to-purple gradients, glassmorphism everywhere, evenly sized card grids with no hierarchy, stock hero sections, Lorem Ipsum, "Feature 1".
 
