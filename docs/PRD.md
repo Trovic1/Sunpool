@@ -30,30 +30,28 @@ Context: short sessions, glanceable numbers, low tolerance for jargon. Many buye
 - **Name:** Sunpool (working name).
 - **Personality:** warm, precise, quietly confident, civic.
 - **Tone of voice:** plain and specific. Numbers carry units. No hype words ("revolutionary", "to the moon"), no exclamation marks in system copy. Errors are calm and say how to recover. Sentence case throughout.
-- **Direction: Lagos daylight** (replaced Warm Editorial on 2026-10-03, see `docs/DESIGN_DIRECTION.md` and `DESIGN.md`). A Lagos street in daylight: one colour, sun yellow, marking only solar energy and money changing hands. Not a newspaper, not a dark crypto terminal.
+- **Direction: Deep forest** (replaced Lagos daylight and Warm Editorial on 2026-10-03, see `DESIGN.md`). Dark, minimal and app-like: one big number, Buy or Sell, a few neighbours, one button. Detail lives on secondary pages.
+- **Concept: prepaid power from your neighbour's roof.** Lagos users already load prepaid units on their DisCo meter. Those units are locked to the meter and Sunpool never touches them. Sunpool sells solar surplus delivered on a shared line (compound, estate, mini-grid) through a small smart meter that counts the loaded kWh down. The meter is simulated in the demo.
 
 ### Palette
 
 | Role | Value | Use |
 | --- | --- | --- |
-| Paper (background) | `#f7f7f4` | Page background |
-| Raised (cards) | `#ffffff` | Panels, inputs |
-| Ink (foreground) | `#111214` | Text, ink buttons, chart line |
-| Muted ink | `#5a5e66` | Metadata, axis labels, timestamps |
-| Sun (the only accent) | `#f2b705` | Filled areas only: the hero band, primary buttons, metered chart area, live badge |
-
-Ink on sun is 10.3:1. Sun on paper is 1.69:1, so yellow is never used for text or thin lines on the light ground. Status colors (success/error) appear only where the UI renders them.
+| Forest (background) | `#0c1f18` | Page background |
+| Card | `#13291f` | Panels |
+| Mist (text) | `#eef5ef` | Text, 15.5:1 on forest |
+| Muted | `#9db3a6` | Secondary text, 7.7:1 on forest |
+| Lime (the only accent) | `#c8f25a` | Primary action, solar energy (filled area), key words; forest text on lime 13.3:1 |
 
 ### Typography
 
-- **Display:** Bricolage Grotesque (variable, optical sizing), bold, tight tracking, for headlines and section titles.
-- **Body / UI:** Geist for labels, body and controls.
+- **Display:** Bricolage Grotesque, extra bold, for big short headlines.
+- **Body / UI:** Geist.
 - **Data:** JetBrains Mono for kWh, prices, addresses, reading IDs and tx hashes, with tabular numbers.
-- Hierarchy comes from scale and weight: big headings and big mono numbers. No eyebrow labels, no section numbering.
 
 ### Surfaces
 
-Ink hairlines at about 13% opacity. 8px radius on controls, 12px on panels, full pills only for status badges. Flat: no offset shadows, no glows, no glassmorphism, no gradients. Floating layers (popover, dialog, tooltip) alone get a soft shadow.
+Large radius (16 to 24px) cards on a dark ground, 10% hairlines, no shadows except floating layers. No glows, no gradients, no glassmorphism.
 
 ### Banned
 
@@ -61,16 +59,13 @@ Indigo-to-purple gradients, glassmorphism, evenly sized card grids with no hiera
 
 ## Screens / sections
 
-1. **Market (home).** The first thing anyone sees.
-   - Masthead: product name, neighborhood name, date, a "Simulated data" tag, wallet/connect slot (disabled in the seeded build with an explanation).
-   - Above the fold: **counters** (kWh traded today, certificates minted, estimated CO₂ avoided with the emission factor visible), **generation curve** (actual so far, forecast for the rest of the day, confidence band, "now" marker), **live trade tape** (seller → buyer, kWh, price in cUSD, time, reading ID).
-   - Below: open listings with Buy, a List surplus action, and a short "how a trade is verified" strip.
-2. **My Home.** Generation vs consumption for the selected house, surplus available, AI price suggestion with its reasoning, active listings.
-3. **Certificate Ledger.** Minted RECs with meter ID, timestamp, kWh, reading ID and consumed status, with block explorer links once on-chain.
-4. **Double-claim demo panel.** A clearly labeled control that submits an already-consumed reading ID and shows the contract rejecting it, with the custom error name.
-5. **About / Impact.** Track alignment, how it scales, the adoption path (MiniPay, smart meter/inverter APIs), and the production path for signed readings.
+1. **Market (home).** Headline, three small totals, and the app panel: Buy power (solar for sale now, today's sun curve, neighbours to pick from, one Load button) or Sell surplus (your spare kWh, amount and price with the AI fair price, List for sale). Below: How it works in three cards.
+2. **Activity.** Totals, the full generation chart with forecast band, and the live trade tape.
+3. **Proof.** The double-claim test against the live contract.
+4. **About.** Costs (generator vs grid), the prepaid-meter explanation, who it is for, what is real vs simulated, track alignment.
+5. Later: My Home and Certificate Ledger.
 
-Global footer on every screen: "Meter data is simulated for this demo. In production, readings are signed by certified smart meters or inverter APIs."
+Global footer on every screen: meter data is simulated; payments and certificates are real on testnet; CO₂ is an estimate.
 
 ## Core interactions
 
@@ -79,7 +74,7 @@ Rule: zero dead ends. Every control gives immediate feedback through a skeleton,
 | Interaction | What happens |
 | --- | --- |
 | Page load | Skeletons shaped like the counters, chart and tape rows. Content staggers in once. |
-| New trade arrives (seeded tick) | Row slides into the top of the tape, the counters count up, and a short sun-yellow wash fades on the new row. A polite live region announces it. |
+| New trade arrives (seeded tick) | Row slides into the top of the tape, the counters count up, and a short lime wash fades on the new row. A polite live region announces it. |
 | Pause / resume tape | Toggle stops the seeded stream. The icon and label change, so motion is not the only cue. |
 | Buy a listing | Row gets an optimistic "Pending" badge, then "Settled" with a toast showing kWh, price and a (simulated) reading ID. On failure, the badge reverts and an error toast names the fix. |
 | List surplus | Dialog (bottom drawer on phone) with kWh and price fields, prefilled with the AI suggestion. Submit shows pending, then the listing appears in the open listings. Validation errors sit next to the field. |
