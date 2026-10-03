@@ -30,29 +30,30 @@ Context: short sessions, glanceable numbers, low tolerance for jargon. Many buye
 - **Name:** Sunpool (working name).
 - **Personality:** warm, precise, quietly confident, civic.
 - **Tone of voice:** plain and specific. Numbers carry units. No hype words ("revolutionary", "to the moon"), no exclamation marks in system copy. Errors are calm and say how to recover. Sentence case throughout.
-- **Direction: Warm Editorial.** Calm, trustworthy, sunlit. A neighborhood newspaper's market page, not a crypto dashboard.
+- **Direction: Lagos daylight** (replaced Warm Editorial on 2026-10-03, see `docs/DESIGN_DIRECTION.md` and `DESIGN.md`). A Lagos street in daylight: one colour, sun yellow, marking only solar energy and money changing hands. Not a newspaper, not a dark crypto terminal.
 
 ### Palette
 
 | Role | Value | Use |
 | --- | --- | --- |
-| Paper (background) | `#faf9f6` | Page background |
-| Ink (foreground) | `#1a1714` | Body text, 1px structural borders |
-| Terracotta (the only accent) | `#ea580c` | Primary action, live states, key numbers |
-| Muted ink | derived from ink on paper, contrast-checked | Metadata tags, axis labels, timestamps |
+| Paper (background) | `#f7f7f4` | Page background |
+| Raised (cards) | `#ffffff` | Panels, inputs |
+| Ink (foreground) | `#111214` | Text, ink buttons, chart line |
+| Muted ink | `#5a5e66` | Metadata, axis labels, timestamps |
+| Sun (the only accent) | `#f2b705` | Filled areas only: the hero band, primary buttons, metered chart area, live badge |
 
-Status colors (success/error) are added only where the UI actually renders them, and never share the accent's hue. Terracotta is not used on static, non-interactive text except for the "live" indicator and hero numbers.
+Ink on sun is 10.3:1. Sun on paper is 1.69:1, so yellow is never used for text or thin lines on the light ground. Status colors (success/error) appear only where the UI renders them.
 
 ### Typography
 
-- **Display:** Fraunces (serif, variable, optical sizing) for headlines and section titles.
-- **Body / UI:** Geist (sans) for labels, body and controls.
+- **Display:** Bricolage Grotesque (variable, optical sizing), bold, tight tracking, for headlines and section titles.
+- **Body / UI:** Geist for labels, body and controls.
 - **Data:** JetBrains Mono for kWh, prices, addresses, reading IDs and tx hashes, with tabular numbers.
-- Hierarchy is set by contrast of scale: large editorial headlines against small, muted metadata tags.
+- Hierarchy comes from scale and weight: big headings and big mono numbers. No eyebrow labels, no section numbering.
 
 ### Surfaces
 
-Sharp 1px ink borders, small radius (4–6px), flat cards. On hover, a subtle hard offset shadow (ink at low opacity, no blur). No glows, no glassmorphism, no gradients.
+Ink hairlines at about 13% opacity. 8px radius on controls, 12px on panels, full pills only for status badges. Flat: no offset shadows, no glows, no glassmorphism, no gradients. Floating layers (popover, dialog, tooltip) alone get a soft shadow.
 
 ### Banned
 
@@ -78,7 +79,7 @@ Rule: zero dead ends. Every control gives immediate feedback through a skeleton,
 | Interaction | What happens |
 | --- | --- |
 | Page load | Skeletons shaped like the counters, chart and tape rows. Content staggers in once. |
-| New trade arrives (seeded tick) | Row slides into the top of the tape, the counters count up, and a short terracotta highlight fades on the new row. A polite live region announces it. |
+| New trade arrives (seeded tick) | Row slides into the top of the tape, the counters count up, and a short sun-yellow wash fades on the new row. A polite live region announces it. |
 | Pause / resume tape | Toggle stops the seeded stream. The icon and label change, so motion is not the only cue. |
 | Buy a listing | Row gets an optimistic "Pending" badge, then "Settled" with a toast showing kWh, price and a (simulated) reading ID. On failure, the badge reverts and an error toast names the fix. |
 | List surplus | Dialog (bottom drawer on phone) with kWh and price fields, prefilled with the AI suggestion. Submit shows pending, then the listing appears in the open listings. Validation errors sit next to the field. |
