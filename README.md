@@ -1,14 +1,18 @@
 # Sunpool
 
-**Your neighbor's rooftop is your power plant. Sunpool makes the trade trustworthy.**
+**Prepaid power from your neighbour's roof.** Load solar units from the house next door, the way you load a prepaid meter. Sunpool makes the trade trustworthy.
 
 Neighborhood solar trading on Celo. Households with rooftop solar sell surplus kWh to nearby buyers, paid in a dollar stablecoin: USDC on the Celo Sepolia testnet, USDm (Mento Dollar, formerly cUSD) on mainnet. Every verified kWh batch mints a renewable energy certificate (REC), and a meter reading ID can be consumed only once, so certificates cannot be double counted. A transparent forecasting layer predicts generation, suggests a fair price and matches sellers to buyers.
 
 IEEE ClimateChain Global Hackathon 2026 · Track: Renewable Energy & Energy Trading.
 
-**Live demo:** https://sunpool-gamma.vercel.app · **Double-claim test:** https://sunpool-gamma.vercel.app/double-claim
+**Live demo:** https://sunpool-gamma.vercel.app · **Activity:** https://sunpool-gamma.vercel.app/activity · **Double-claim proof:** https://sunpool-gamma.vercel.app/double-claim
 
 > **Meter data is simulated.** A server-side meter key signs each reading (`/api/readings`). Listings, USDC payments and certificates are real transactions on the Celo Sepolia testnet. In production, certified smart meters or inverter APIs sign readings on the device. The generation chart for Surulere, Lagos is modeled, not metered.
+
+## How power reaches the buyer
+
+In Lagos, most homes load prepaid units onto their DisCo meter. Those units are locked to that meter number and cannot be resold, and Sunpool never touches them. Sunpool sells **solar surplus**: midday output that a rooftop makes beyond what its home uses. That power travels over a shared line (a compound, an estate or a mini-grid) to the buyer's socket. A small smart meter on that line counts the loaded kWh down like prepaid units and signs each reading. In this demo the meter is simulated.
 
 ## Deployed contracts (Celo Sepolia, chain ID 11142220)
 
@@ -93,5 +97,5 @@ Next.js (App Router) · TypeScript · Hardhat 3 + viem · OpenZeppelin 5 · Tail
 
 ## Docs
 
-- [`docs/PRD.md`](docs/PRD.md): design PRD and Lagos daylight brand
+- [`docs/PRD.md`](docs/PRD.md): design PRD, concept and Deep forest brand; [`DESIGN.md`](DESIGN.md): tokens and components
 - [`docs/SUBMISSION.md`](docs/SUBMISSION.md): running Devpost write-up
