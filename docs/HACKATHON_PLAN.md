@@ -14,11 +14,11 @@ Gaps a judge will catch:
 - `SUBMISSION.md` scalability section empty; no demo script; no video.
 
 Work list (branch `judging-pass`):
-1. [ ] AI layer as route handlers: `/api/forecast` (real Lagos irradiance from Open-Meteo + smoothing) and reading anomaly screening in `/api/readings` (reject readings a rooftop could not physically produce).
-2. [ ] Threat model: `docs/THREAT_MODEL.md`, summarized on About.
-3. [ ] Certificate Ledger page (`/certificates`).
+1. [x] AI layer as route handlers: `/api/forecast` (real Lagos irradiance from Open-Meteo + smoothing) and reading anomaly screening in `/api/readings` (reject readings a rooftop could not physically produce).
+2. [x] Threat model: `docs/THREAT_MODEL.md`, summarized on About.
+3. [x] Certificate Ledger page (`/certificates`).
 4. [x] Loading skeletons instead of zero counters.
-5. [ ] Finish `SUBMISSION.md` and write `docs/DEMO_SCRIPT.md`.
+5. [x] Finish `SUBMISSION.md` and write `docs/DEMO_SCRIPT.md`.
 Then: record the demo video (user), submit on Devpost well before Oct 25.
 
 
