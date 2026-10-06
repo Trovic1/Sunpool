@@ -42,28 +42,32 @@ function MarketView({ market }: { market: MarketModel }) {
     <main id="main" className="mx-auto flex w-full max-w-6xl flex-col gap-20 px-4 py-8 sm:px-6 sm:py-14">
       <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
         <div className="flex flex-col gap-6">
-          <p className="w-fit rounded-full border border-border px-3 py-1 text-sm text-muted-foreground">
+          <p className="enter w-fit rounded-full border border-border px-3 py-1 text-sm text-muted-foreground" style={{ "--enter-i": 0 } as React.CSSProperties}>
             {NEIGHBORHOOD.name}, {NEIGHBORHOOD.city}
             <span className="ms-2 font-mono tabular">
               {minuteLabel(market.minute)} {NEIGHBORHOOD.timezone}
             </span>
           </p>
-          <h1 id="market-heading" className="font-display text-[2.75rem] leading-[0.95] font-extrabold sm:text-6xl lg:text-7xl">
+          <h1 id="market-heading" style={{ "--enter-i": 1 } as React.CSSProperties} className="enter font-display text-[2.75rem] leading-[0.95] font-extrabold sm:text-6xl lg:text-7xl">
             Prepaid power from your <span className="text-accent-text">neighbour&rsquo;s roof.</span>
           </h1>
-          <p className="max-w-md text-lg text-pretty text-muted-foreground">
+          <p className="enter max-w-md text-lg text-pretty text-muted-foreground" style={{ "--enter-i": 2 } as React.CSSProperties}>
             Load solar units from the house next door. Cheaper than a generator, paid from your phone.
           </p>
-          <dl className="flex flex-wrap gap-x-8 gap-y-3 pt-2">
+          <dl className="enter flex flex-wrap gap-x-8 gap-y-3 pt-2" style={{ "--enter-i": 3 } as React.CSSProperties}>
             <Stat label={chain ? "Traded on Celo" : "Traded today"} value={`${formatKwh(totals.kwh)} kWh`} loading={loading} />
             <Stat label="Certificates" value={String(totals.certificates)} loading={loading} />
             <Stat label="CO₂ avoided (est.)" value={`${formatKwh(totals.co2Kg)} kg`} loading={loading} />
           </dl>
         </div>
-        <TradePanel market={market} />
+        <div className="enter" style={{ "--enter-i": 2 } as React.CSSProperties}>
+          <TradePanel market={market} />
+        </div>
       </div>
 
-      <HowItWorks />
+      <div className="enter" style={{ "--enter-i": 5 } as React.CSSProperties}>
+        <HowItWorks />
+      </div>
 
       {!chain && (
         <div className="flex justify-center">
