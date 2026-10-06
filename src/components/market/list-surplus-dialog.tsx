@@ -1,6 +1,6 @@
 "use client"
 
-import { Sparkles } from "lucide-react"
+import { Scale } from "lucide-react"
 import { useId, useRef, useState, type FormEvent } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -292,7 +292,7 @@ export function ListSurplusForm({
 
       {compact ? (
         <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
-          <Sparkles aria-hidden className="size-4 text-accent-text" />
+          <Scale aria-hidden className="size-4 text-accent-text" />
           Fair price now <span className="font-mono text-foreground tabular">{formatPrice(suggestion.price)}</span>
           {Number(price) !== suggestion.price && (
             <Button type="button" variant="link" size="sm" className="h-auto px-0" onClick={() => setPrice(suggestion.price.toFixed(3))}>
@@ -303,7 +303,7 @@ export function ListSurplusForm({
       ) : (
         <aside className="flex flex-col gap-2 rounded-md border border-rule bg-muted p-3 text-sm">
           <p className="flex items-center gap-1.5 font-medium">
-            <Sparkles aria-hidden className="size-4 text-accent-text" />
+            <Scale aria-hidden className="size-4 text-accent-text" />
             Suggested price:{" "}
             <span className="font-mono tabular">{formatPrice(suggestion.price)}</span> {CURRENCY}/kWh
           </p>

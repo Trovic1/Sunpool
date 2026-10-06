@@ -54,7 +54,7 @@ Contrast (WCAG): mist on forest 15.5:1; muted on forest 7.7:1, on card 6.9:1; li
 
 ## Motion
 
-Spring tab pill, offer rows that slide in, numbers that count up, and a tape row that slides in with a lime wash. All of it is reduced under `prefers-reduced-motion`.
+Market home enters with one staggered fade-and-rise (`.enter` in `globals.css`, 700 ms expo ease-out, 80 ms steps set by `--enter-i`): location, headline, subline and the trade panel, stats, then How it works. Pure CSS, so content is never stuck hidden. Then: spring tab pill, offer rows that slide in, numbers that count up, and a tape row that slides in with a lime wash. All of it is reduced under `prefers-reduced-motion`.
 
 ## Honesty in the UI
 
