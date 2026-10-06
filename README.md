@@ -6,7 +6,7 @@ Neighborhood solar trading on Celo. Households with rooftop solar sell surplus k
 
 IEEE ClimateChain Global Hackathon 2026 · Track: Renewable Energy & Energy Trading.
 
-**Live demo:** https://sunpool-gamma.vercel.app · **Activity:** https://sunpool-gamma.vercel.app/activity · **Double-claim proof:** https://sunpool-gamma.vercel.app/double-claim · **Certificates:** https://sunpool-gamma.vercel.app/certificates
+**Live demo:** https://sunpool-gamma.vercel.app (one scrolling page: Market, Activity, Certificates, Proof, About) · **Activity:** https://sunpool-gamma.vercel.app/activity · **Double-claim proof:** https://sunpool-gamma.vercel.app/double-claim · **Certificates:** https://sunpool-gamma.vercel.app/certificates
 
 > **Meter data is simulated.** A server-side meter key signs each reading (`/api/readings`), and only after the reading passes a verification check against live sunlight data for Surulere (Open-Meteo) and the seller's listings on Celo. Listings, USDC payments and certificates are real transactions on the Celo Sepolia testnet. In production, certified smart meters or inverter APIs sign readings on the device. The generation chart for Surulere, Lagos is modeled, not metered. Security assumptions and open risks: [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md).
 

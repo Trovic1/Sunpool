@@ -49,12 +49,13 @@ Contrast (WCAG): mist on forest 15.5:1; muted on forest 7.7:1, on card 6.9:1; li
 - **How it works** (`market/how-it-works.tsx`): three cards: Load units, Their roof powers your line, Counted once and paid instantly.
 - **Activity page:** totals, the full generation chart with confidence band, and the trade tape with a lime flash on new rows.
 - **Certificates page:** totals card (kWh certified, count, estimated CO₂ with its factor), then the ledger: a table on desktop, stacked rows on phones. Each reading carries a green "Consumed" badge and a "Verify reading" popover that re-reads the registry from the browser. All / Mine pill switch, backed by `?view=mine`.
-- **Masthead:** logo in a lime disc, then Market, Activity, Certificates, Proof and About as pills, a Testnet badge and the wallet button. No border. On phones the pills sit in a second row, spaced to fit 360px without scrolling.
+- **One-page home:** `/` stacks Market, Activity, Certificates, Proof and About as sections (`SectionShell` in `site/section-shell.tsx`; the hero keeps the page h1, the rest use h2). On the home page the Activity and Certificates totals are hidden because the hero already shows them. `/activity`, `/certificates`, `/double-claim` and `/about` still render each section on its own for deep links.
+- **Masthead:** sticky; logo in a lime disc, then Market, Activity, Certificates, Proof and About as pills, a Testnet badge and the wallet button. Links go to `/#section`; a scroll-spy (`use-active-section.ts`) slides the active pill as you scroll. A hairline appears once the page scrolls. On phones the pills sit in a second row, spaced to fit 360px without scrolling.
 - **Trade tape:** when there are fewer trades than fill the card, it ends with "That's every trade so far" and a List surplus link instead of empty space.
 
 ## Motion
 
-Market home enters with one staggered fade-and-rise (`.enter` in `globals.css`, 700 ms expo ease-out, 80 ms steps set by `--enter-i`): location, headline, subline and the trade panel, stats, then How it works. Pure CSS, so content is never stuck hidden. Then: spring tab pill, offer rows that slide in, numbers that count up, and a tape row that slides in with a lime wash. All of it is reduced under `prefers-reduced-motion`.
+Scroll reveal (`.reveal`): blocks zoom in from 94% and rise as they enter, and ease back to 96% at 35% opacity as they leave the top. It runs on the browser's scroll timeline (`animation-timeline: view()`), capped in pixels so tall blocks stay readable, and is skipped where unsupported and under reduced motion. Market home also enters with one staggered fade-and-rise (`.enter` in `globals.css`, 700 ms expo ease-out, 80 ms steps set by `--enter-i`): location, headline, subline and the trade panel, stats, then How it works. Pure CSS, so content is never stuck hidden. Then: spring tab pill, offer rows that slide in, numbers that count up, and a tape row that slides in with a lime wash. All of it is reduced under `prefers-reduced-motion`.
 
 ## Honesty in the UI
 

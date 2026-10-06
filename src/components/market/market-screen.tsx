@@ -39,7 +39,11 @@ function MarketView({ market }: { market: MarketModel }) {
   const loading = market.status === "loading"
 
   return (
-    <main id="main" className="mx-auto flex w-full max-w-6xl flex-col gap-20 px-4 py-8 sm:px-6 sm:py-14">
+    <section
+      id="market"
+      aria-labelledby="market-heading"
+      className="mx-auto flex w-full max-w-6xl scroll-mt-28 flex-col gap-20 px-4 py-8 sm:px-6 sm:py-14 md:scroll-mt-20"
+    >
       <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
         <div className="flex flex-col gap-6">
           <p className="enter w-fit rounded-full border border-border px-3 py-1 text-sm text-muted-foreground" style={{ "--enter-i": 0 } as React.CSSProperties}>
@@ -65,7 +69,7 @@ function MarketView({ market }: { market: MarketModel }) {
         </div>
       </div>
 
-      <div className="enter" style={{ "--enter-i": 5 } as React.CSSProperties}>
+      <div className="reveal">
         <HowItWorks />
       </div>
 
@@ -74,7 +78,7 @@ function MarketView({ market }: { market: MarketModel }) {
           <ScenarioSwitch market={market} />
         </div>
       )}
-    </main>
+    </section>
   )
 }
 

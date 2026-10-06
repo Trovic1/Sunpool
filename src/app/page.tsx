@@ -1,10 +1,18 @@
 import { Suspense } from "react"
 
+import { AboutContent } from "@/components/about/about-content"
+import { CertificateLedger } from "@/components/certificates/certificate-ledger"
+import { ProofSection } from "@/components/double-claim/proof-section"
+import { ActivityScreen } from "@/components/market/activity-screen"
 import { MarketScreen } from "@/components/market/market-screen"
 import { Masthead } from "@/components/site/masthead"
 import { SiteFooter } from "@/components/site/site-footer"
 
-export default function MarketPage() {
+/**
+ * The whole app on one scroll: Market, Activity, Certificates, Proof and About. The masthead
+ * follows along and links to each section. Every section also has its own route for deep links.
+ */
+export default function HomePage() {
   return (
     <>
       <a
@@ -16,9 +24,21 @@ export default function MarketPage() {
       <Suspense fallback={<div className="h-16" />}>
         <Masthead />
       </Suspense>
-      <Suspense>
-        <MarketScreen />
-      </Suspense>
+      <main id="main">
+        <Suspense>
+          <MarketScreen />
+        </Suspense>
+        <Suspense>
+          <ActivityScreen embedded />
+        </Suspense>
+        <Suspense>
+          <CertificateLedger embedded />
+        </Suspense>
+        <Suspense>
+          <ProofSection embedded />
+        </Suspense>
+        <AboutContent embedded />
+      </main>
       <SiteFooter />
     </>
   )
