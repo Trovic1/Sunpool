@@ -46,8 +46,6 @@ next-env.d.ts
 /cache
 /typechain-types
 
-# Claude Code worktrees
-.claude/worktrees/
 
 # AI tooling (kept local, not published)
 .claude/
