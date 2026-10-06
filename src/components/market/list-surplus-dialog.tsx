@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/drawer"
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import type { Market } from "@/hooks/use-market"
@@ -30,6 +31,7 @@ import { CURRENCY, formatKwh, formatPrice, minuteLabel, shortAddress } from "@/l
 import { DEMO_SELLER, NEIGHBORHOOD, TOTAL_PANEL_KW } from "@/lib/seed"
 import { KWP_DEFAULT, KWP_MAX, KWP_MIN } from "@/lib/verify"
 
+import { AnimatedNumber } from "./animated-number"
 import { VerificationPanel } from "./verification-panel"
 
 const PRICE_MIN = 0.05
@@ -120,6 +122,16 @@ export function ListSurplusForm({
   const kWpValid = Number(kWp) >= KWP_MIN && Number(kWp) <= KWP_MAX
   const verification = useVerification(market, Math.round(Number(kwh) * 10) * 100, kWpValid ? Number(kWp) : NaN)
   const verdict = verification.status === "ready" ? verification.result : undefined
+  // What the meter will sign right now: the verified headroom, never more than the sunset forecast.
+  const latest = verification.status === "ready" || verification.status === "checking" ? verification.result : undefined
+  const readyNow = latest ? Math.min(available, Math.floor(latest.headroomWh / 100) / 10) : undefined
+  // Until the seller types an amount, keep the default inside what can be signed now.
+  const [touched, setTouched] = useState(false)
+  const [fittedTo, setFittedTo] = useState<number>()
+  if (!touched && readyNow !== undefined && readyNow !== fittedTo) {
+    setFittedTo(readyNow)
+    if (readyNow >= 0.1 && Number(kwh) > readyNow) setKwh(readyNow.toFixed(1))
+  }
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault()
@@ -164,6 +176,23 @@ export function ListSurplusForm({
 
   return (
     <form onSubmit={onSubmit} noValidate className="flex flex-col gap-5">
+      {compact && (
+        <div className="flex flex-col gap-1">
+          <p className="text-sm text-muted-foreground">Ready to sell now (simulated meter)</p>
+          <p className="font-mono text-6xl leading-none font-bold tracking-tight tabular">
+            {readyNow === undefined ? (
+              <Skeleton className="inline-block h-14 w-40 bg-foreground/10 align-bottom" aria-label="Checking your roof" />
+            ) : (
+              <AnimatedNumber value={readyNow} format={formatKwh} />
+            )}
+            <span className="ms-2 text-2xl font-medium text-muted-foreground">kWh</span>
+          </p>
+          <p className="text-sm text-muted-foreground">
+            What your roof has made so far today, minus home use.{" "}
+            <span className="font-mono tabular">{formatKwh(available)}</span> kWh expected by sunset.
+          </p>
+        </div>
+      )}
       <FieldGroup>
         <Field data-invalid={errors.kwh ? true : undefined}>
           <FieldLabel htmlFor={`${id}-kwh`}>Energy to sell (kWh)</FieldLabel>
@@ -174,7 +203,10 @@ export function ListSurplusForm({
             inputMode="decimal"
             autoComplete="off"
             value={kwh}
-            onChange={(e) => setKwh(e.target.value)}
+            onChange={(e) => {
+              setTouched(true)
+              setKwh(e.target.value)
+            }}
             aria-invalid={errors.kwh ? true : undefined}
             aria-describedby={`${id}-kwh-help`}
             className="h-10 font-mono tabular"
@@ -183,8 +215,17 @@ export function ListSurplusForm({
             <FieldError id={`${id}-kwh-help`}>{errors.kwh}</FieldError>
           ) : (
             <FieldDescription id={`${id}-kwh-help`}>
-              Up to <span className="font-mono tabular">{formatKwh(available)}</span> kWh forecast
-              surplus before sunset ({minuteLabel(untilMinute)} WAT).
+              {readyNow === undefined ? (
+                <>
+                  Up to <span className="font-mono tabular">{formatKwh(available)}</span> kWh forecast surplus before sunset (
+                  {minuteLabel(untilMinute)} WAT).
+                </>
+              ) : (
+                <>
+                  Up to <span className="font-mono tabular">{formatKwh(readyNow)}</span> kWh now; more becomes available as
+                  the sun rises, until {minuteLabel(untilMinute)} WAT.
+                </>
+              )}
             </FieldDescription>
           )}
         </Field>
@@ -243,6 +284,7 @@ export function ListSurplusForm({
       <VerificationPanel
         state={verification}
         onUseMax={(max) => {
+          setTouched(true)
           setKwh(Math.min(max, available).toFixed(1))
           setErrors((e) => ({ ...e, kwh: undefined }))
         }}

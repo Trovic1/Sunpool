@@ -56,7 +56,7 @@ export function TradeTape({ market, onListSurplus }: { market: Market; onListSur
         {announcement}
       </p>
 
-      <CardContent className="relative min-h-0 flex-1 px-0">
+      <CardContent className="relative flex min-h-0 flex-1 flex-col px-0">
         {status === "loading" && <TapeSkeleton />}
 
         {(status === "error" || status === "reconnecting") && (
@@ -108,6 +108,15 @@ export function TradeTape({ market, onListSurplus }: { market: Market; onListSur
 
         {status === "ready" && trades.length > 0 && (
           <TapeList trades={trades.slice(0, VISIBLE_ROWS)} account={market.account} />
+        )}
+
+        {status === "ready" && trades.length > 0 && trades.length < VISIBLE_ROWS && (
+          <div className="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-border px-6 py-4 text-sm text-muted-foreground">
+            <span>That&rsquo;s every trade so far.</span>
+            <Button variant="link" size="sm" className="h-auto px-0" onClick={onListSurplus}>
+              List surplus
+            </Button>
+          </div>
         )}
       </CardContent>
     </Card>

@@ -44,12 +44,13 @@ Contrast (WCAG): mist on forest 15.5:1; muted on forest 7.7:1, on card 6.9:1; li
 
 - **Trade panel** (`market/trade-panel.tsx`): a segmented Buy power / Sell surplus switch with a spring pill, backed by `?tab=sell`.
   - **Buy:** "Solar for sale near you now" big kWh, cheapest price, sun curve, offer rows (tap to select, lime ring and check), then one full-width "Load X kWh for Y USDC" button.
-  - **Sell:** your spare kWh, the amount and price form with the fair price hint, "List for sale", and your listings.
+  - **Sell:** "Ready to sell now" big kWh (the AI verification's headroom: what the roof has made so far today, minus home use and earlier listings), the sunset forecast as the supporting line, then the amount, rooftop size and price form, the AI verification panel, the fair price hint, "List for sale", and your listings. The amount defaults inside what the meter will sign now.
 - **Sun curve** (`market/sun-curve.tsx`): today's output. Metered is a lime area and the forecast is a dashed muted line, with a dot for now. No axes.
 - **How it works** (`market/how-it-works.tsx`): three cards: Load units, Their roof powers your line, Counted once and paid instantly.
 - **Activity page:** totals, the full generation chart with confidence band, and the trade tape with a lime flash on new rows.
 - **Certificates page:** totals card (kWh certified, count, estimated CO₂ with its factor), then the ledger: a table on desktop, stacked rows on phones. Each reading carries a green "Consumed" badge and a "Verify reading" popover that re-reads the registry from the browser. All / Mine pill switch, backed by `?view=mine`.
-- **Masthead:** logo in a lime disc, then Market, Activity, Certificates, Proof and About as pills, a Testnet badge and the wallet button. No border.
+- **Masthead:** logo in a lime disc, then Market, Activity, Certificates, Proof and About as pills, a Testnet badge and the wallet button. No border. On phones the pills sit in a second row, spaced to fit 360px without scrolling.
+- **Trade tape:** when there are fewer trades than fill the card, it ends with "That's every trade so far" and a List surplus link instead of empty space.
 
 ## Motion
 

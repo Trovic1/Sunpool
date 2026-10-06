@@ -14,7 +14,7 @@ import { DEMO_SELLER, houseById } from "@/lib/seed"
 import { cn } from "@/lib/utils"
 
 import { AnimatedNumber } from "./animated-number"
-import { ListSurplusForm, availableSurplus } from "./list-surplus-dialog"
+import { ListSurplusForm } from "./list-surplus-dialog"
 import { SunCurve } from "./sun-curve"
 
 const TABS = ["buy", "sell"] as const
@@ -202,21 +202,11 @@ function InlineFooter({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function SellPanel({ market }: { market: MarketModel }) {
-  const surplus = availableSurplus(market)
   const mine = market.listings.filter((l) => isOwn(l, market.account))
   const [key, setKey] = useState(0)
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex flex-col gap-1">
-        <p className="text-sm text-muted-foreground">Your spare solar today (simulated meter)</p>
-        <p className="font-mono text-6xl leading-none font-bold tracking-tight tabular">
-          <AnimatedNumber value={surplus} format={fmtKwh} />
-          <span className="ms-2 text-2xl font-medium text-muted-foreground">kWh</span>
-        </p>
-        <p className="text-sm text-muted-foreground">What your panels will make before sunset, minus what your home uses.</p>
-      </div>
-
       <ListSurplusForm
         key={key}
         market={market}
