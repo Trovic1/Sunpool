@@ -1,5 +1,27 @@
 # Hackathon plan: from working prototype to a submission that shows real-world use
 
+> **Start here in a new session.** Read this file, then `docs/SUBMISSION.md`. Section 0 is the current to-do list.
+
+## 0. Judging review (2026-10-06) and current work
+
+Self-review against the Devpost judging criteria: Technical execution 8.5, Climate impact 7.5, Practical usefulness 7, Innovation 6.5, Presentation 6 (no video yet). Overall about 7.5/10.
+
+Gaps a judge will catch:
+- The "AI" was thin: exponential smoothing and a median price ±5%. The hackathon is blockchain **and** AI, judged by IEEE academics.
+- No threat model. `/api/readings` signs a reading for any wallet; the only guard is an in-memory per-wallet counter. Session 2 of the hackathon was on AI and cybersecurity.
+- Home counters show 0.0 kWh / 0 certificates for ~5 s before chain data arrives.
+- Certificate Ledger page not built.
+- `SUBMISSION.md` scalability section empty; no demo script; no video.
+
+Work list (branch `judging-pass`):
+1. [ ] AI layer as route handlers: `/api/forecast` (real Lagos irradiance from Open-Meteo + smoothing) and reading anomaly screening in `/api/readings` (reject readings a rooftop could not physically produce).
+2. [ ] Threat model: `docs/THREAT_MODEL.md`, summarized on About.
+3. [ ] Certificate Ledger page (`/certificates`).
+4. [x] Loading skeletons instead of zero counters.
+5. [ ] Finish `SUBMISSION.md` and write `docs/DEMO_SCRIPT.md`.
+Then: record the demo video (user), submit on Devpost well before Oct 25.
+
+
 Status on 2026-10-01: the full loop works on Celo Sepolia. A real wallet bought 2.5 kWh from the demo rooftop, paid 0.32 USDC, and received certificate #1. The double-claim test rejects a reused reading on the live contract.
 
 This file is the agenda for the next sessions. Facts marked **(verify)** still need a source before they go into the pitch or the Devpost write-up.
