@@ -23,7 +23,13 @@ export type MarketListing = Omit<Listing, "untilMinute"> & {
   pending?: boolean
 }
 
-export type ListSurplusInput = { kwh: number; price: number; untilMinute: number }
+export type ListSurplusInput = {
+  kwh: number
+  price: number
+  untilMinute: number
+  /** Declared rooftop size; the meter's verification check uses it for the physical limit. */
+  kWp?: number
+}
 
 /** The shape every Market component reads. Implemented by the seeded and on-chain hooks. */
 export type MarketModel = {
