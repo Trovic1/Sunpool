@@ -19,6 +19,8 @@ import {
   weatherFactor,
   type Trade,
 } from "./seed"
+import type { Sky } from "./irradiance"
+import { PERFORMANCE_RATIO } from "./verify"
 
 /** Smoothing weight for the actual/forecast ratio. */
 export const SMOOTHING_ALPHA = 0.3
@@ -143,7 +145,15 @@ export type PriceSuggestion = {
   reason: string
 }
 
-export function suggestPrice(trades: Trade[], nowMinute: number): PriceSuggestion {
+/**
+ * `supplyKw` overrides the modeled next-hour neighbourhood supply, e.g. with one
+ * derived from live irradiance (see `skyForecast`).
+ */
+export function suggestPrice(
+  trades: Pick<Trade, "price">[],
+  nowMinute: number,
+  { supplyKw }: { supplyKw?: number } = {},
+): PriceSuggestion {
   const recent = trades.slice(0, 20).map((t) => t.price).sort((a, b) => a - b)
   const median = recent.length
     ? recent.length % 2
@@ -152,7 +162,7 @@ export function suggestPrice(trades: Trade[], nowMinute: number): PriceSuggestio
     : (PRICE_FLOOR + PRICE_CEILING) / 2
 
   const nextHour = nowMinute + 60
-  const supply = clearSkyKw(nextHour) * forecastWeatherFactor(nextHour)
+  const supply = supplyKw ?? clearSkyKw(nextHour) * forecastWeatherFactor(nextHour)
   const demand = demandKw(nextHour)
   // Buyers-only demand is what the market clears against.
   const buyerShare = BUYERS.reduce((sum, h) => sum + h.loadKw, 0) / HOUSES.reduce((s, h) => s + h.loadKw, 0)
@@ -185,3 +195,59 @@ export const isDaylight = (minute: number) =>
   minute > NEIGHBORHOOD.sunriseMinutes && minute < NEIGHBORHOOD.sunsetMinutes
 
 const round2 = (value: number) => Math.round(value * 100) / 100
+
+// ---------------------------------------------------------------------------
+// Forecast from irradiance (live Open-Meteo or the modeled clear sky)
+// ---------------------------------------------------------------------------
+
+/** Typical clear-sky share actually reached when only the modeled sky is known. */
+export const MODELED_CLEARNESS = 0.75
+
+export type SkyForecastPoint = {
+  /** Start of the hour, minutes after today's WAT midnight. */
+  start: number
+  label: string
+  /** Mean irradiance over the hour, W/m². */
+  ghi: number
+  cloud: number | null
+  /** Expected energy from the given array in this hour, kWh. */
+  kwh: number
+  /** Confidence band [low, high], kWh. */
+  band: [number, number]
+}
+
+/**
+ * Hour-by-hour generation for an array of `kWp`, from the current hour onwards.
+ *
+ * Expected kWh = kWp × GHI/1000 × performance ratio × 1 h. With live weather the band
+ * half-width is 10% + 3% per hour ahead + up to 25% for full cloud cover, because
+ * forecast irradiance under cloud is least reliable. With the modeled sky the point
+ * estimate is 75% of clear sky and the band runs from 30% to 100% of clear sky.
+ */
+export function skyForecast(sky: Sky, nowMinute: number, kWp: number, hours = 12): SkyForecastPoint[] {
+  const first = Math.floor(nowMinute / 60) * 60
+  return sky.hours
+    .filter((h) => h.start >= first && h.start < first + hours * 60)
+    .map((h) => {
+      const clear = (kWp * h.ghi * PERFORMANCE_RATIO) / 1000
+      let kwh: number
+      let band: [number, number]
+      if (sky.source === "modeled") {
+        kwh = clear * MODELED_CLEARNESS
+        band = [clear * 0.3, clear]
+      } else {
+        const ahead = Math.max(0, (h.start - nowMinute) / 60)
+        const half = Math.min(0.9, 0.1 + 0.03 * ahead + 0.25 * ((h.cloud ?? 50) / 100))
+        kwh = clear
+        band = [clear * (1 - half), clear * (1 + half)]
+      }
+      return {
+        start: h.start,
+        label: minuteLabel(h.start % 1440),
+        ghi: h.ghi,
+        cloud: h.cloud,
+        kwh: round2(kwh),
+        band: [round2(band[0]), round2(band[1])],
+      }
+    })
+}

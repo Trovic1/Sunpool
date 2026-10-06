@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit && hardhat compile && tsc --noEmit -p tsconfig.hardhat.json",
     "contracts:compile": "hardhat compile",
     "contracts:test": "hardhat test",
+    "test:unit": "tsx --test src/lib/*.test.ts",
     "contracts:deploy": "node --env-file=.env.local node_modules/hardhat/dist/src/cli.js ignition deploy ignition/modules/Sunpool.ts --network celoSepolia --parameters ignition/parameters/celoSepolia.json",
     "contracts:abis": "hardhat compile && node scripts/export-abis.ts"
   },
@@ -54,6 +55,7 @@
     "eslint-config-next": "16.3.8",
     "hardhat": "^3.18.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   },
   "type": "module"
