@@ -48,7 +48,8 @@ Contrast (WCAG): mist on forest 15.5:1; muted on forest 7.7:1, on card 6.9:1; li
 - **Sun curve** (`market/sun-curve.tsx`): today's output. Metered is a lime area and the forecast is a dashed muted line, with a dot for now. No axes.
 - **How it works** (`market/how-it-works.tsx`): three cards: Load units, Their roof powers your line, Counted once and paid instantly.
 - **Activity page:** totals, the full generation chart with confidence band, and the trade tape with a lime flash on new rows.
-- **Masthead:** logo in a lime disc, then Market, Activity, Proof and About as pills, a Testnet badge and the wallet button. No border.
+- **Certificates page:** totals card (kWh certified, count, estimated CO₂ with its factor), then the ledger: a table on desktop, stacked rows on phones. Each reading carries a green "Consumed" badge and a "Verify reading" popover that re-reads the registry from the browser. All / Mine pill switch, backed by `?view=mine`.
+- **Masthead:** logo in a lime disc, then Market, Activity, Certificates, Proof and About as pills, a Testnet badge and the wallet button. No border.
 
 ## Motion
 
