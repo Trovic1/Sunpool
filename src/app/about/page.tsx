@@ -1,4 +1,16 @@
-import { ArrowUpRight, Building2, Factory, Gauge, KeyRound, Store, Sun, Users, type LucideIcon } from "lucide-react"
+import {
+  ArrowUpRight,
+  Building2,
+  CloudSun,
+  Factory,
+  Gauge,
+  KeyRound,
+  ShieldCheck,
+  Store,
+  Sun,
+  Users,
+  type LucideIcon,
+} from "lucide-react"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Suspense } from "react"
@@ -43,9 +55,30 @@ const FOR_WHO: { icon: LucideIcon; who: string; why: string }[] = [
 
 const REAL = [
   ["Real on testnet", "Listings, USDC payments, certificates, double-claim rejection"],
-  ["Simulated", "The smart meter and its readings, the Surulere solar curve"],
+  ["Simulated", "The smart meter and its readings, the Surulere solar curve on the chart"],
+  ["Live data", "Sunlight forecast for Surulere from Open-Meteo, used to verify readings"],
   ["Estimated", "CO₂ avoided, at 0.456 kg per kWh"],
 ] as const
+
+const REPO_URL = "https://github.com/Trovic1/Sunpool"
+
+const TRUST: { icon: LucideIcon; title: string; body: string }[] = [
+  {
+    icon: ShieldCheck,
+    title: "Counted once",
+    body: "Each reading ID can be consumed once on-chain. A second claim reverts, so no kWh backs two certificates.",
+  },
+  {
+    icon: CloudSun,
+    title: "Checked against the sun",
+    body: "Before the meter signs, an AI check compares the reading with today's sunlight in Surulere, the roof size and the seller's listings today. Impossible amounts are refused.",
+  },
+  {
+    icon: KeyRound,
+    title: "Keys that can be revoked",
+    body: "Only registered meter keys can sign. A leaked or tampered meter is revoked on-chain; in production each meter keeps its key in a secure chip.",
+  },
+]
 
 const TRACK = ["Peer-to-peer trading", "Certificate tracking", "Microgrid coordination", "Tokenised incentives"]
 
@@ -209,6 +242,38 @@ export default function AboutPage() {
               </div>
             ))}
           </dl>
+        </section>
+
+        <section aria-labelledby="trust-heading" className="flex flex-col gap-6">
+          <div className="flex max-w-2xl flex-col gap-2">
+            <h2 id="trust-heading" className="font-display text-3xl font-bold sm:text-4xl">
+              Security &amp; trust
+            </h2>
+            <p className="text-pretty text-muted-foreground">
+              The chain makes every claim count once. The weak link is whoever signs the meter reading, so that step
+              is checked too.
+            </p>
+          </div>
+          <ul className="grid gap-3 md:grid-cols-3">
+            {TRUST.map(({ icon: Icon, title, body }) => (
+              <li key={title} className="flex flex-col gap-3 rounded-3xl border border-border bg-card p-5">
+                <Icon aria-hidden className="size-6 text-accent-text" />
+                <p className="font-display text-lg font-bold">{title}</p>
+                <p className="text-sm text-pretty text-muted-foreground">{body}</p>
+              </li>
+            ))}
+          </ul>
+          <p className="text-sm text-muted-foreground">
+            Demo limits: one shared meter key, rooftop size declared by the seller, one admin account.{" "}
+            <a
+              href={`${REPO_URL}/blob/main/docs/THREAT_MODEL.md`}
+              target="_blank"
+              rel="noreferrer"
+              className="font-medium text-accent-text hover:underline"
+            >
+              Read the threat model
+            </a>
+          </p>
         </section>
 
         <section aria-label="Hackathon track" className="flex flex-wrap items-center gap-2">

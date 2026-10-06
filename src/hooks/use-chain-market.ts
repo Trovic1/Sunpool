@@ -210,18 +210,18 @@ export function useChainMarket(): MarketModel {
   )
 
   const listSurplus = useCallback(
-    async ({ kwh, price }: ListSurplusInput) => {
+    async ({ kwh, price, kWp }: ListSurplusInput) => {
       const account = await wallet.ensureReady()
       if (!account) throw new Error("no-wallet")
-      const toastId = toast.loading("Requesting a signed meter reading…", {
-        description: "Simulated meter, signed by the registered meter key.",
+      const toastId = toast.loading("Verifying and signing the meter reading…", {
+        description: "AI verification checks it against today's sun, then the simulated meter signs.",
       })
       let optimisticId: string | undefined
       try {
         const res = await fetch("/api/readings", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ seller: account, wh: Math.round(kwh * 1000) }),
+          body: JSON.stringify({ seller: account, wh: Math.round(kwh * 1000), kWp }),
         })
         const body = await res.json()
         if (!res.ok) throw new Error(body.error ?? "The meter could not issue a reading.")
