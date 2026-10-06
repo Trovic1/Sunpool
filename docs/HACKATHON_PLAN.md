@@ -58,7 +58,7 @@ Pitch framing: first customers are **estates, compounds and mini-grid operators*
 ## 4. Build list for the next sessions (in priority order)
 
 1. ✅ **About / Impact page** (done 2026-10-01, `/about`): track alignment, the five user stories above, the production path, honest notes. Judges read this.
-2. **Certificate Ledger page**: every certificate with meter ID, reading ID, Wh, owner and an explorer link; reading IDs marked "consumed".
+2. ✅ **Certificate Ledger page** (done 2026-10-06, `/certificates`, `GET /api/certificates`): every certificate with meter ID, reading ID, kWh, producer, owner, price paid and explorer links for the token and settling tx; reading IDs marked "consumed" from `ReadingRegistry.consumedAt`, with a per-row live `isConsumed` check; totals with estimated CO₂; "Mine" filter for the connected wallet.
 3. **My Home page**: the connected wallet's listings, purchases and certificates; generation vs consumption; the price suggestion with its reasoning; cancel a listing.
 4. **AI layer as a route handler** (per CLAUDE.md): `/api/forecast` and `/api/match` returning the forecast, price suggestion and a seller-to-buyer match, so the model is visible and testable.
 5. **Polish found while testing**: ✅ tape names wrap; ✅ `?state=` dropped on the on-chain market; still to do: mobile and MiniPay test.
