@@ -43,7 +43,66 @@ In Lagos, grid supply is unreliable and many homes run diesel generators, while 
 
 ## Scalability and adoption
 
-_To fill in: MiniPay distribution, smart meter / inverter API onboarding, per-neighborhood markets._
+**Who adopts first.** Estates, compounds and solar mini-grid operators, because a shared line between sellers and buyers already exists there and one operator can onboard a whole street. Lagos now licenses these operators directly: in May 2026 LASERC approved 14 licences and permits covering off-grid and embedded generation, independent distribution, metering services and interconnected mini-grids (see `docs/RESEARCH.md`). Sunpool is the settlement and certificate layer such an operator would otherwise build itself.
+
+**Why buyers come.** Generator power costs ₦750/kWh (petrol) to ₦950/kWh (diesel) according to Nigeria's Minister of Power, against a ₦206.80–₦225/kWh Band A grid tariff. 51% of Lagos residents rent (Fortren & Company, 2026) and cannot put panels on their roof. Daytime-only users such as tailors, barbers and cold rooms need a few kWh, not a whole system.
+
+**Why it's easy to adopt.**
+- Phone-first: buyers pay from MiniPay, which is available in Nigeria and supports USDC and USDm, or from any EVM wallet. No new app or bank account.
+- Familiar mental model: "load units" like a prepaid meter. Sunpool never touches DisCo prepaid units.
+- Sellers list in one step; the price suggestion and the verification check run automatically.
+
+**How it scales technically.**
+
+| Today (demo) | Production |
+| --- | --- |
+| One simulated meter key, server-side, screened by the verification model | One key per certified smart meter or inverter, held on the device; registered and revoked through `METER_ADMIN_ROLE` |
+| Celo Sepolia, test USDC | Celo mainnet, USDm or USDC, both supported in MiniPay |
+| One neighbourhood market | One `EnergyMarket` per estate or mini-grid, sharing one `ReadingRegistry` and `RECToken`, so a reading can't be double counted across markets (already true for our two deployed markets) |
+| Polling indexer in a route handler | Event indexer (The Graph, SubQuery or similar) |
+| Manual listing | Auto-listing of forecast surplus at the suggested price; standing buy orders |
+
+Celo fees are a fraction of a cent, so a 0.5 kWh purchase stays economical.
+
+**Policy fit.** Certificates carry meter ID, reading ID, timestamp and Wh on-chain, giving companies and policymakers an auditable record of local renewable generation that can't be double counted. This supports transparent reporting toward COP 31 goals.
+
+## Devpost sections
+
+### Inspiration
+
+Midday on a Lagos street: one roof has panels producing more than the house uses, and the shop next door is running a petrol generator. The power is right there; what's missing is a trustworthy way to meter it, pay for it and prove it was green.
+
+### What it does
+
+Rooftop owners list solar surplus backed by a meter-signed reading. A verification model checks each reading against real Lagos irradiance before it's signed. Neighbours buy it from a phone in a dollar stablecoin. Each sale pays the owner instantly and mints one renewable energy certificate. A reading can be consumed only once, so certificates can't be double counted, and the app proves this live against the contract.
+
+### How we built it
+
+Solidity contracts (`ReadingRegistry`, `EnergyMarket`, `RECToken`) on OpenZeppelin 5 with Hardhat 3 and 20 tests, deployed and verified on Celo Sepolia. EIP-712 signed meter readings. A Next.js App Router front end with wagmi and viem, plus server route handlers for the simulated meter, market indexing, forecasting and reading verification. Weather data comes from Open-Meteo.
+
+### Challenges we ran into
+
+- Test USDm was practically unobtainable on Celo Sepolia, so the live market settles in USDC from Circle's faucet and the USDm market is paused. The contracts take any ERC-20 stablecoin.
+- Public RPC nodes prune old blocks, so the indexer derives timestamps for old events instead of fetching the blocks.
+- Being honest about physical delivery: electricity can't travel through an app. We documented the three delivery paths and built for the realistic one first: a shared line in an estate or mini-grid.
+
+### Accomplishments that we're proud of
+
+- The full loop works on a public testnet with real wallets: list, buy, pay, certificate.
+- The double-claim proof runs against the live contract with no wallet needed.
+- Every number on screen is either on-chain or sourced, and simulated data is labelled as simulated.
+
+### What we learned
+
+Most of the trust problem in energy trading sits at the meter, not on the chain. A smart contract can guarantee "once", but only the meter can attest "real". That's why the verification model and the threat model matter as much as the contracts.
+
+### What's next for Sunpool
+
+A pilot proposal with one Lagos estate or mini-grid operator. Device-signed readings through an inverter cloud API, starting with Growatt's published Open API. Mainnet launch inside MiniPay. Auto-listing and standing buy orders.
+
+## Demo video
+
+_Link goes here after recording. Script: `docs/DEMO_SCRIPT.md`._
 
 ## Honesty notes
 
