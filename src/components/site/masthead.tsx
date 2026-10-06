@@ -83,7 +83,7 @@ export function Masthead() {
         </div>
       </div>
       <nav aria-label="Main" className="md:hidden">
-        <NavLinks className="overflow-x-auto px-3 pb-2" />
+        <NavLinks className="justify-between gap-0 overflow-x-auto px-1.5 pb-2 after:w-1.5 after:shrink-0 after:content-[''] [&_a]:px-2.5" />
       </nav>
     </header>
   )
