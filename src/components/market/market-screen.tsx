@@ -7,6 +7,7 @@ import type { MarketModel } from "@/hooks/market-types"
 import { useChainMarket } from "@/hooks/use-chain-market"
 import { useDataSource } from "@/hooks/use-data-source"
 import { useMarket } from "@/hooks/use-market"
+import { Skeleton } from "@/components/ui/skeleton"
 import { formatKwh, minuteLabel } from "@/lib/format"
 import { NEIGHBORHOOD } from "@/lib/seed"
 
@@ -35,6 +36,7 @@ function SeededMarket() {
 function MarketView({ market }: { market: MarketModel }) {
   const chain = market.mode === "chain"
   const { totals } = market
+  const loading = market.status === "loading"
 
   return (
     <main id="main" className="mx-auto flex w-full max-w-6xl flex-col gap-20 px-4 py-8 sm:px-6 sm:py-14">
@@ -53,9 +55,9 @@ function MarketView({ market }: { market: MarketModel }) {
             Load solar units from the house next door. Cheaper than a generator, paid from your phone.
           </p>
           <dl className="flex flex-wrap gap-x-8 gap-y-3 pt-2">
-            <Stat label={chain ? "Traded on Celo" : "Traded today"} value={`${formatKwh(totals.kwh)} kWh`} />
-            <Stat label="Certificates" value={String(totals.certificates)} />
-            <Stat label="CO₂ avoided (est.)" value={`${formatKwh(totals.co2Kg)} kg`} />
+            <Stat label={chain ? "Traded on Celo" : "Traded today"} value={`${formatKwh(totals.kwh)} kWh`} loading={loading} />
+            <Stat label="Certificates" value={String(totals.certificates)} loading={loading} />
+            <Stat label="CO₂ avoided (est.)" value={`${formatKwh(totals.co2Kg)} kg`} loading={loading} />
           </dl>
         </div>
         <TradePanel market={market} />
@@ -72,11 +74,13 @@ function MarketView({ market }: { market: MarketModel }) {
   )
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value, loading }: { label: string; value: string; loading: boolean }) {
   return (
     <div className="flex flex-col">
       <dt className="text-sm text-muted-foreground">{label}</dt>
-      <dd className="font-mono text-xl font-semibold tabular">{value}</dd>
+      <dd className="font-mono text-xl font-semibold tabular">
+        {loading ? <Skeleton className="mt-1 h-6 w-20 bg-foreground/10" aria-label="Loading" /> : value}
+      </dd>
     </div>
   )
 }

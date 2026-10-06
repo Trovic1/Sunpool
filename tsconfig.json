@@ -44,6 +44,7 @@
     "ignition",
     "artifacts",
     "cache",
-    "types"
+    "types",
+    ".claude"
   ]
 }

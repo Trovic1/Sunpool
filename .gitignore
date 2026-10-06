@@ -45,3 +45,6 @@ next-env.d.ts
 /artifacts
 /cache
 /typechain-types
+
+# Claude Code worktrees
+.claude/worktrees/
