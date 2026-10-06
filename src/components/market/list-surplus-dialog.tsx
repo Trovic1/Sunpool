@@ -25,8 +25,12 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import type { Market } from "@/hooks/use-market"
+import { useVerification } from "@/hooks/use-verification"
 import { CURRENCY, formatKwh, formatPrice, minuteLabel, shortAddress } from "@/lib/format"
 import { DEMO_SELLER, NEIGHBORHOOD, TOTAL_PANEL_KW } from "@/lib/seed"
+import { KWP_DEFAULT, KWP_MAX, KWP_MIN } from "@/lib/verify"
+
+import { VerificationPanel } from "./verification-panel"
 
 const PRICE_MIN = 0.05
 const PRICE_MAX = 0.3
@@ -87,7 +91,7 @@ export function ListSurplusDialog({ market, open, onOpenChange }: Props) {
   )
 }
 
-type Errors = { kwh?: string; price?: string }
+type Errors = { kwh?: string; kWp?: string; price?: string }
 
 export function ListSurplusForm({
   market,
@@ -106,15 +110,21 @@ export function ListSurplusForm({
   const suggestion = market.suggestion
   const [kwh, setKwh] = useState(() => String(Math.min(2, available).toFixed(1)))
   const [price, setPrice] = useState(() => suggestion.price.toFixed(3))
+  const [kWp, setKwp] = useState(() => String(market.mode === "seeded" ? DEMO_SELLER.panelKw : KWP_DEFAULT))
   const [errors, setErrors] = useState<Errors>({})
   const [submitting, setSubmitting] = useState(false)
   const kwhRef = useRef<HTMLInputElement>(null)
+  const kWpRef = useRef<HTMLInputElement>(null)
   const priceRef = useRef<HTMLInputElement>(null)
   const untilMinute = NEIGHBORHOOD.sunsetMinutes
+  const kWpValid = Number(kWp) >= KWP_MIN && Number(kWp) <= KWP_MAX
+  const verification = useVerification(market, Math.round(Number(kwh) * 10) * 100, kWpValid ? Number(kWp) : NaN)
+  const verdict = verification.status === "ready" ? verification.result : undefined
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault()
     const kwhValue = Number(kwh)
+    const kWpValue = Number(kWp)
     const priceValue = Number(price)
     const next: Errors = {}
     if (!Number.isFinite(kwhValue) || kwhValue < 0.1 || kwhValue > available) {
@@ -122,12 +132,18 @@ export function ListSurplusForm({
         available < 0.1
           ? "No surplus is forecast for the rest of today."
           : `Enter between 0.1 and ${formatKwh(available)} kWh.`
+    } else if (verdict?.verdict === "reject") {
+      next.kwh = verdict.reasons[0]
+    }
+    if (!Number.isFinite(kWpValue) || kWpValue < KWP_MIN || kWpValue > KWP_MAX) {
+      next.kWp = `Enter a rooftop size between ${KWP_MIN} and ${KWP_MAX} kWp.`
     }
     if (!Number.isFinite(priceValue) || priceValue < PRICE_MIN || priceValue > PRICE_MAX) {
       next.price = `Enter a price between ${formatPrice(PRICE_MIN)} and ${formatPrice(PRICE_MAX)} ${CURRENCY}/kWh.`
     }
     setErrors(next)
     if (next.kwh) return kwhRef.current?.focus()
+    if (next.kWp) return kWpRef.current?.focus()
     if (next.price) return priceRef.current?.focus()
 
     setSubmitting(true)
@@ -136,6 +152,7 @@ export function ListSurplusForm({
         kwh: Math.round(kwhValue * 10) / 10,
         price: Math.round(priceValue * 1000) / 1000,
         untilMinute,
+        kWp: kWpValue,
       })
       onDone()
     } catch {
@@ -172,6 +189,29 @@ export function ListSurplusForm({
           )}
         </Field>
 
+        <Field data-invalid={errors.kWp ? true : undefined}>
+          <FieldLabel htmlFor={`${id}-kwp`}>Rooftop size (kWp)</FieldLabel>
+          <Input
+            ref={kWpRef}
+            id={`${id}-kwp`}
+            name="kwp"
+            inputMode="decimal"
+            autoComplete="off"
+            value={kWp}
+            onChange={(e) => setKwp(e.target.value)}
+            aria-invalid={errors.kWp ? true : undefined}
+            aria-describedby={`${id}-kwp-help`}
+            className="h-10 font-mono tabular"
+          />
+          {errors.kWp ? (
+            <FieldError id={`${id}-kwp-help`}>{errors.kWp}</FieldError>
+          ) : (
+            <FieldDescription id={`${id}-kwp-help`}>
+              Your panels&rsquo; rated size, {KWP_MIN}–{KWP_MAX} kWp. It sets the most your roof could have made today.
+            </FieldDescription>
+          )}
+        </Field>
+
         <Field data-invalid={errors.price ? true : undefined}>
           <FieldLabel htmlFor={`${id}-price`}>Price ({CURRENCY} per kWh)</FieldLabel>
           <Input
@@ -199,6 +239,14 @@ export function ListSurplusForm({
           )}
         </Field>
       </FieldGroup>
+
+      <VerificationPanel
+        state={verification}
+        onUseMax={(max) => {
+          setKwh(Math.min(max, available).toFixed(1))
+          setErrors((e) => ({ ...e, kwh: undefined }))
+        }}
+      />
 
       {compact ? (
         <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
