@@ -173,3 +173,48 @@
     animation: none;
   }
 }
+
+/* One-page home: in-page links glide instead of jumping. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/*
+ * Scroll reveal, driven by the browser's own scroll timeline (no JavaScript): a block zooms
+ * in and rises as it enters from below, and eases back slightly as it leaves at the top.
+ * Browsers without scroll-driven animations, and reduced motion, simply show the content.
+ */
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(32px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes reveal-out {
+  to {
+    opacity: 0.35;
+    transform: scale(0.96);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation:
+        reveal-in cubic-bezier(0.16, 1, 0.3, 1) both,
+        reveal-out linear both;
+      animation-timeline: view(), view();
+      /* Capped in pixels so tall blocks are fully visible while you read them. */
+      animation-range:
+        entry 0% entry min(70%, 260px),
+        exit max(0%, calc(100% - 240px)) exit 100%;
+    }
+  }
+}

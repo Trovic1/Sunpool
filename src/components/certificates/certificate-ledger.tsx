@@ -9,6 +9,7 @@ import { useMemo, type ReactNode } from "react"
 import { AnimatedNumber } from "@/components/market/animated-number"
 import { Alert, AlertAction, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
+import { SectionShell, SectionTitle } from "@/components/site/section-shell"
 import { Button } from "@/components/ui/button"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -33,7 +34,8 @@ const fmtInt = (n: number) => Math.round(n).toLocaleString("en-US")
 
 const sameAddress = (a?: string, b?: string) => Boolean(a && b && a.toLowerCase() === b.toLowerCase())
 
-export function CertificateLedger() {
+export function CertificateLedger({ embedded = false }: { embedded?: boolean }) {
+  const Sub = embedded ? "h3" : "h2"
   const query = useCertificates()
   const wallet = useWallet()
   const [view, setView] = useQueryState("view", parseAsStringLiteral(VIEWS).withDefault("all"))
@@ -52,25 +54,28 @@ export function CertificateLedger() {
   const status = query.isPending ? "loading" : query.isError && !ledger ? "error" : "ready"
 
   return (
-    <main id="main" className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-8 sm:px-6 sm:py-14">
-      <div className="flex max-w-3xl flex-col gap-4">
-        <h1 className="font-display text-5xl leading-[0.95] font-extrabold sm:text-6xl">
+    <SectionShell id="certificates" embedded={embedded} className="gap-10">
+      <div className="reveal flex max-w-3xl flex-col gap-4">
+        <SectionTitle id="certificates" embedded={embedded} className="text-5xl sm:text-6xl">
           Every kWh, <span className="text-accent-text">certified once.</span>
-        </h1>
+        </SectionTitle>
         <p className="max-w-xl text-lg text-pretty text-muted-foreground">
           Each purchase mints a certificate on Celo Sepolia. Its meter reading is consumed on-chain, so the same
           energy can&rsquo;t be claimed twice.
         </p>
       </div>
 
-      <Summary status={status} certificates={ledger?.totals.certificates ?? 0} wh={ledger?.totals.wh ?? 0} />
+      {/* On the home page the hero already shows these totals. */}
+      {!embedded && (
+        <Summary status={status} certificates={ledger?.totals.certificates ?? 0} wh={ledger?.totals.wh ?? 0} />
+      )}
 
-      <section aria-labelledby="ledger-heading" className="flex flex-col rounded-3xl border border-border bg-card">
+      <section aria-labelledby="ledger-heading" className="reveal flex flex-col rounded-3xl border border-border bg-card">
         <div className="flex flex-col gap-4 border-b border-border p-4 sm:flex-row sm:items-end sm:justify-between sm:p-6">
           <div className="flex flex-col gap-1">
-            <h2 id="ledger-heading" className="font-display text-2xl font-bold">
+            <Sub id="ledger-heading" className="font-display text-2xl font-bold">
               Certificate ledger
-            </h2>
+            </Sub>
             <p className="text-sm text-muted-foreground" role="status" aria-live="polite">
               {status === "ready"
                 ? view === "mine" && !wallet.address
@@ -175,11 +180,11 @@ export function CertificateLedger() {
       <p className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
         <ContractLink href={explorerAddress(SUNPOOL_CONTRACTS.recToken)}>RECToken contract</ContractLink>
         <ContractLink href={explorerAddress(SUNPOOL_CONTRACTS.readingRegistry)}>ReadingRegistry contract</ContractLink>
-        <Link href="/double-claim" className="underline decoration-dotted underline-offset-2 hover:text-foreground">
+        <Link href={embedded ? "#proof" : "/double-claim"} className="underline decoration-dotted underline-offset-2 hover:text-foreground">
           Try a double claim
         </Link>
       </p>
-    </main>
+    </SectionShell>
   )
 }
 
