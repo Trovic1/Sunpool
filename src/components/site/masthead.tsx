@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils"
 const NAV = [
   { href: "/", label: "Market" },
   { href: "/activity", label: "Activity" },
+  { href: "/certificates", label: "Certificates" },
   { href: "/double-claim", label: "Proof" },
   { href: "/about", label: "About" },
 ] as const
@@ -48,7 +49,7 @@ export function Masthead() {
   return (
     <header className="bg-background">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3 lg:gap-6">
           <Link href="/" className="flex items-center gap-2 rounded-sm" aria-label="Sunpool, market home">
             <span className="flex size-8 items-center justify-center rounded-full bg-sun text-sun-foreground">
               <Sun aria-hidden className="size-[18px]" strokeWidth={2.25} />
@@ -61,7 +62,7 @@ export function Masthead() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="hidden sm:inline-flex">
+          <Badge variant="outline" className="hidden sm:inline-flex md:hidden lg:inline-flex">
             {source === "chain" ? "Testnet" : "Demo data"}
           </Badge>
           {source === "chain" ? (

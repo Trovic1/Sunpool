@@ -151,14 +151,36 @@ async function readListings(): Promise<ChainListing[]> {
     .reverse()
 }
 
+let syncing: Promise<bigint> | null = null
+
+/**
+ * Brings the shared trade cache up to the chain head. Concurrent callers (market polls,
+ * the certificate ledger) share one scan, so the cache never gets duplicate rows.
+ * Resolves to the head block number.
+ */
+export function syncTrades() {
+  syncing ??= (async () => {
+    try {
+      const headNumber = await refreshHead()
+      await scanTrades(headNumber)
+      return headNumber
+    } finally {
+      syncing = null
+    }
+  })()
+  return syncing
+}
+
+/** Every TradeSettled event seen so far on the live market, in chain order. */
+export const cachedTrades = (): readonly ChainTrade[] => cache.trades
+
 let inflight: Promise<MarketSnapshot> | null = null
 
 export function getMarketSnapshot() {
   // Collapse concurrent polls into one RPC round trip.
   inflight ??= (async () => {
     try {
-      const headNumber = await refreshHead()
-      const [listings] = await Promise.all([readListings(), scanTrades(headNumber)])
+      const [headNumber, listings] = await Promise.all([syncTrades(), readListings()])
       const trades = [...cache.trades].sort((a, b) => b.timestamp - a.timestamp)
       return {
         listings,
