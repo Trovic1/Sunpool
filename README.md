@@ -8,7 +8,7 @@ IEEE ClimateChain Global Hackathon 2026 · Track: Renewable Energy & Energy Trad
 
 **Live demo:** https://sunpool-gamma.vercel.app · **Activity:** https://sunpool-gamma.vercel.app/activity · **Double-claim proof:** https://sunpool-gamma.vercel.app/double-claim
 
-> **Meter data is simulated.** A server-side meter key signs each reading (`/api/readings`). Listings, USDC payments and certificates are real transactions on the Celo Sepolia testnet. In production, certified smart meters or inverter APIs sign readings on the device. The generation chart for Surulere, Lagos is modeled, not metered.
+> **Meter data is simulated.** A server-side meter key signs each reading (`/api/readings`), and only after the reading passes a verification check against live sunlight data for Surulere (Open-Meteo) and the seller's listings on Celo. Listings, USDC payments and certificates are real transactions on the Celo Sepolia testnet. In production, certified smart meters or inverter APIs sign readings on the device. The generation chart for Surulere, Lagos is modeled, not metered. Security assumptions and open risks: [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md).
 
 ## How power reaches the buyer
 
@@ -61,7 +61,10 @@ Source is verified on Blockscout. Network details live in `src/lib/chain/celo.ts
 | Market screen on Celo Sepolia: wallet, buy, list, live tape, counters | Done |
 | Double-claim test page (live contract) | Done |
 | Seeded offline demo (`?source=seeded`) | Done |
-| About & impact page (delivery paths, use cases, sourced numbers, production path) | Done |
+| About & impact page (delivery paths, use cases, sourced numbers, production path, security & trust) | Done |
+| AI verification of meter readings (live irradiance bound, on-chain per-seller accounting, anomaly score) + 19 unit tests | Done |
+| `/api/forecast` and `/api/verify` route handlers | Done |
+| Threat model ([`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md)) | Done |
 | My Home, Certificate Ledger | Planned |
 
 ## Run it
@@ -79,7 +82,7 @@ The offline demo stays available at `/?source=seeded` (or `NEXT_PUBLIC_DATA_SOUR
 - `/?source=seeded&state=empty`: pre-dawn, no trades yet
 - `/?source=seeded&state=error`: trade feed offline, with retry
 
-Checks: `npm run lint`, `npm run typecheck`, `npm run contracts:test`, `npm run build`.
+Checks: `npm run lint`, `npm run typecheck`, `npm run test:unit` (verification and forecast logic, `node:test` via tsx), `npm run contracts:test`, `npm run build`.
 
 Contracts: `npm run contracts:test`, `npm run contracts:deploy` (needs `DEPLOYER_PRIVATE_KEY`), `npm run contracts:abis` after any contract change.
 
@@ -87,8 +90,15 @@ Contracts: `npm run contracts:test`, `npm run contracts:deploy` (needs `DEPLOYER
 
 - **Seed data** (`src/lib/seed.ts`): 14 named households, 8 with rooftop arrays (2.8–8.4 kW). Deterministic PRNG, so every run looks the same.
 - **Solar curve:** half-sine between Lagos sunrise and sunset (06:45–18:45 WAT, early October), scaled to a specific yield of 5.0 kWh/kWp/day (Lagos is typically 4.5–5.4).
-- **Forecast** (`src/lib/forecast.ts`): clear-sky curve × forecast weather factor, corrected by an exponentially smoothed (α = 0.3) ratio of metered to forecast output. The confidence band widens with the horizon. No ML dependency.
-- **Price suggestion:** median of the last 20 trades, adjusted up to ±5% for next-hour supply vs buyer demand.
+- **Forecast chart** (`src/lib/forecast.ts`): clear-sky curve × forecast weather factor, corrected by an exponentially smoothed (α = 0.3) ratio of metered to forecast output. The confidence band widens with the horizon. No ML dependency.
+- **Sunlight data** (`src/lib/irradiance.ts`): hourly global horizontal irradiance (GHI, W/m²) and cloud cover for Surulere (6.50° N, 3.35° E) from the free [Open-Meteo forecast API](https://open-meteo.com/en/docs), cached 30 minutes. This is weather-model irradiance, not a pyranometer. If the API fails or takes over 3 s, a clear-sky curve (1000 W/m² at noon) is used and labelled "modeled".
+- **AI verification of readings** (`src/lib/verify.ts`, `POST /api/verify`, enforced in `/api/readings`): a transparent rule-based anomaly check, not a trained model.
+  - *Time of day:* no new surplus reading before sunrise or after sunset (hard reject); low sun near the edges adds risk.
+  - *Physical limit:* most a roof could spare so far today = kWp × irradiation since midnight ÷ 1 kW/m² × 0.8 performance ratio − 300 W self-consumption × daylight hours. The new reading plus the seller's `Listed` Wh since WAT midnight (read from Celo, so it survives restarts) must fit (hard reject).
+  - *Neighbours:* z-score of the request against recent listings by other sellers (needs at least 5).
+  - *Risk* = 0.60 × share of the limit used + 0.25 × outlier score + 0.15 × low sun. Reject on a hard rule or risk ≥ 0.70; 0.40–0.70 is signed but flagged for review. The Sell form shows the verdict, risk, reasons and data source before signing. Rooftop size is declared by the seller (1–15 kWp) in the demo.
+- **Forecast API** (`GET /api/forecast?kWp=5`): hourly kWh for a rooftop = kWp × GHI/1000 × 0.8, with a band of ±(10% + 3% per hour ahead + up to 25% for cloud cover); on the modeled sky, 75% of clear sky with a 30–100% band.
+- **Price suggestion:** median of the last 20 trades, adjusted up to ±5% for next-hour supply vs buyer demand. `/api/forecast` uses live-irradiance supply for the neighbourhood's 42 kWp; the market panel still uses the modeled curve.
 - **Estimated CO₂ avoided:** traded kWh × 0.456 kg CO₂e/kWh (Nigeria grid 2025, lifecycle, [Ember via Our World in Data](https://ourworldindata.org/grapher/carbon-intensity-electricity)). This is an estimate; it assumes each traded kWh displaces an average grid kWh.
 
 ## Stack
@@ -99,3 +109,4 @@ Next.js (App Router) · TypeScript · Hardhat 3 + viem · OpenZeppelin 5 · Tail
 
 - [`docs/PRD.md`](docs/PRD.md): design PRD, concept and Deep forest brand; [`DESIGN.md`](DESIGN.md): tokens and components
 - [`docs/SUBMISSION.md`](docs/SUBMISSION.md): running Devpost write-up
+- [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md): assets, trust boundaries, threats and mitigations, production path
