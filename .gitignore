@@ -48,3 +48,10 @@ next-env.d.ts
 
 # Claude Code worktrees
 .claude/worktrees/
+
+# AI tooling (kept local, not published)
+.claude/
+.agents/
+CLAUDE.md
+AGENTS.md
+skills-lock.json

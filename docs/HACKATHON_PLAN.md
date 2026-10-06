@@ -34,7 +34,7 @@ This file is the agenda for the next sessions. Facts marked **(verify)** still n
 | Technical soundness | Verified contracts, 20 tests, signed readings, one-time reading IDs, live indexer | Architecture doc, certificate ledger, matching/forecast as a server route |
 | Clarity | Clean market screen, double-claim page | About/Impact page, demo video, a 60-second story |
 
-Submission checklist (from CLAUDE.md): track statement, project description, 3–5 minute video, public repo with docs, working demo link. Repo and demo link are done.
+Submission checklist: track statement, project description, 3–5 minute video, public repo with docs, working demo link. Repo and demo link are done.
 
 ## 2. Who uses this in the real world (sample usage)
 
