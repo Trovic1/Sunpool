@@ -1,6 +1,7 @@
 "use client"
 
-import { ArrowUpRight, Coins, LogOut, TriangleAlert, Wallet } from "lucide-react"
+import { ArrowUpRight, Coins, House, LogOut, TriangleAlert, Wallet } from "lucide-react"
+import Link from "next/link"
 import { toast } from "sonner"
 import { formatUnits } from "viem"
 import { useBalance, useReadContract, useWatchAsset } from "wagmi"
@@ -78,6 +79,12 @@ export function WalletButton() {
             <dd className="font-mono text-lg tabular">{fmt(celo.data?.value, 18, 3)}</dd>
           </div>
         </dl>
+        <Button asChild size="sm" className="w-full">
+          <Link href="/me">
+            <House data-icon="inline-start" />
+            My Home
+          </Link>
+        </Button>
         <Separator />
         <ul className="flex flex-col gap-1.5 text-sm">
           <li>

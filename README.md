@@ -66,7 +66,7 @@ Source is verified on Blockscout. Network details live in `src/lib/chain/celo.ts
 | `/api/forecast` and `/api/verify` route handlers | Done |
 | Threat model ([`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md)) | Done |
 | Certificate Ledger (`/certificates`): every REC with reading consumed in the registry, live verify, explorer links | Done |
-| My Home | Planned |
+| My Home (`/me`, from the wallet menu): your loaded kWh, sales, open listings with cancel, trades and certificates | Done |
 
 ## Run it
 

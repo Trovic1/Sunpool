@@ -30,7 +30,7 @@ Sunpool is a hackathon demo (IEEE ClimateChain Global Hackathon 2026, track: Ren
 ## Capabilities and Constraints
 
 - Working today: list surplus (with AI verification), buy, stablecoin settlement, certificate minting, live trade tape, certificate ledger, double-claim proof, generation forecast with confidence band, sourced CO₂ estimate.
-- Not built: My Home page, seller-to-buyer matching (`/api/match`).
+- Not built: seller-to-buyer matching (`/api/match`).
 - Meter data is simulated (a server-side key signs readings). Physical delivery of electricity is outside the app; the realistic first deployment is a shared line in an estate or mini-grid.
 - Terminology: buyers "load" kWh; sellers "list surplus"; one reading → one sale → one certificate; "estimated CO₂ avoided".
 - The demo must never break: keep the seeded fallback working.
