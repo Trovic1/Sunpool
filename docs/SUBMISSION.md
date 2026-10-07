@@ -37,6 +37,7 @@ In Lagos, grid supply is unreliable and many homes run diesel generators, while 
 - `GET /api/forecast`: hourly generation forecast with a confidence band and a suggested price with its reasoning, driven by live irradiance.
 - Certificate Ledger (`/certificates`): every certificate with producer, owner, meter and reading IDs, price paid and Blockscout links. "Verify reading" checks the registry from the browser.
 - Threat model (`docs/THREAT_MODEL.md`), summarized on the About page: fake readings, replay, key theft, sybil wallets, admin risk, and what's demo-only versus mitigated.
+- My Home (`/me`, from the wallet menu): the connected wallet's loaded kWh and estimated CO₂, sales and earnings, open listings with a two-step cancel, trades and certificates.
 - Offline seeded mode (`?source=seeded`) for Surulere, Lagos, clearly labeled as simulated
 - Minimal app home: one Buy power / Sell surplus panel, "Load X kWh" in one tap, AI fair price on the Sell tab
 - Live trade tape (on /activity) with pause/resume, optimistic "Pending" rows and screen-reader announcements
