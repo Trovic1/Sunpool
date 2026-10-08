@@ -46,7 +46,7 @@ Go back to the valid amount and list it. Show the toast and the transaction.
 
 **Screen:** Buyer profile → Market → Buy power → Load.
 
-> "Now I'm the neighbour, a tailor whose generator costs a fortune. One tap: load half a kilowatt-hour."
+> "Now I'm the neighbour, a tailor whose generator costs a fortune. I type how much I need, and Sunpool's matcher picks the cheapest set of offers that covers it, and tells me why. One tap: load."
 
 Approve and confirm. Show pending → settled.
 
