@@ -19,7 +19,18 @@ Work list (branch `judging-pass`):
 3. [x] Certificate Ledger page (`/certificates`).
 4. [x] Loading skeletons instead of zero counters.
 5. [x] Finish `SUBMISSION.md` and write `docs/DEMO_SCRIPT.md`.
+6. [x] `docs/ARCHITECTURE.md` (2026-10-08).
+7. [x] `/api/match` seller-to-buyer matching (2026-10-08; confirm the route is merged before submitting).
+8. [x] Mobile layout check at 375px on every page (2026-10-08: no horizontal overflow, buy flow and Best match usable). Still to do on a real phone: MiniPay in-app test.
 Then: record the demo video (user), submit on Devpost well before Oct 25.
+
+Definition of done (status 2026-10-08):
+- [x] Contracts deployed on Celo Sepolia, addresses in README
+- [x] Live demo URL (desktop checked); [ ] phone width / MiniPay device test pending
+- [x] Double-claim rejection shown working (`/double-claim`)
+- [x] README with setup, architecture diagram and track alignment
+- [ ] Demo video 3-5 minutes (script in `docs/DEMO_SCRIPT.md`)
+- [ ] Devpost submitted, with buffer
 
 
 Status on 2026-10-01: the full loop works on Celo Sepolia. A real wallet bought 2.5 kWh from the demo rooftop, paid 0.32 USDC, and received certificate #1. The double-claim test rejects a reused reading on the live contract.
@@ -82,9 +93,9 @@ Pitch framing: first customers are **estates, compounds and mini-grid operators*
 1. ✅ **About / Impact page** (done 2026-10-01, `/about`): track alignment, the five user stories above, the production path, honest notes. Judges read this.
 2. ✅ **Certificate Ledger page** (done 2026-10-06, `/certificates`, `GET /api/certificates`): every certificate with meter ID, reading ID, kWh, producer, owner, price paid and explorer links for the token and settling tx; reading IDs marked "consumed" from `ReadingRegistry.consumedAt`, with a per-row live `isConsumed` check; totals with estimated CO₂; "Mine" filter for the connected wallet.
 3. ✅ **My Home page** (done 2026-10-07, `/me`): the connected wallet's listings, purchases and certificates; generation vs consumption; the price suggestion with its reasoning; cancel a listing.
-4. ✅ **AI layer as route handlers** (done 2026-10-06): `GET /api/forecast` (hourly rooftop generation from live Open-Meteo irradiance with a confidence band, suggested price with its reasoning, clear-sky fallback labelled "modeled") and `POST /api/verify` (dry run of the reading check). `/api/readings` now refuses to sign readings that fail the check: daylight only, physical bound from kWp × today's irradiation × 0.8 PR minus a self-consumption floor, cumulative per-seller accounting from on-chain `Listed` events, and a peer z-score, combined into a 0–1 risk with reasons. Shown in the Sell flow; unit-tested (`npm run test:unit`). Threat model in `docs/THREAT_MODEL.md`. Still open: `/api/match` (seller-to-buyer matching).
-5. **Polish found while testing**: ✅ tape names wrap; ✅ `?state=` dropped on the on-chain market; still to do: mobile and MiniPay test.
-6. **Docs**: `docs/ARCHITECTURE.md` with a diagram, `docs/DEMO_SCRIPT.md`, finish `docs/SUBMISSION.md` (scalability and adoption section).
+4. ✅ **AI layer as route handlers** (done 2026-10-06): `GET /api/forecast` (hourly rooftop generation from live Open-Meteo irradiance with a confidence band, suggested price with its reasoning, clear-sky fallback labelled "modeled") and `POST /api/verify` (dry run of the reading check). `/api/readings` now refuses to sign readings that fail the check: daylight only, physical bound from kWp × today's irradiation × 0.8 PR minus a self-consumption floor, cumulative per-seller accounting from on-chain `Listed` events, and a peer z-score, combined into a 0–1 risk with reasons. Shown in the Sell flow; unit-tested (`npm run test:unit`). Threat model in `docs/THREAT_MODEL.md`. `/api/match` (lowest-cost cover of the requested kWh, whole listings, with reasons) added 2026-10-08, see `docs/ARCHITECTURE.md` section 6.3.
+5. **Polish found while testing**: ✅ tape names wrap; ✅ `?state=` dropped on the on-chain market; ✅ 375px layout check; still to do: MiniPay in-app test on a phone.
+6. **Docs**: ✅ `docs/ARCHITECTURE.md` with a diagram (done 2026-10-08), ✅ `docs/DEMO_SCRIPT.md`, ✅ `docs/SUBMISSION.md` scalability and adoption section.
 7. **Design pass** (last, as agreed).
 
 ## 5. How we present it

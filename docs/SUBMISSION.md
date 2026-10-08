@@ -34,6 +34,7 @@ In Lagos, grid supply is unreliable and many homes run diesel generators, while 
 - Double-claim page replays an already-consumed reading against the live contract and shows the rejection, no wallet needed.
 
 - AI verification before the meter signs: each reading is checked against live Lagos irradiance from Open-Meteo (falls back to a modeled clear sky), the seller's energy already listed today (read from the chain, so it survives restarts), the time of day and neighbouring sellers. It returns accept, review or reject with a risk score and plain-language reasons. Shown in the Sell flow; exposed at `POST /api/verify`. 19 unit tests.
+- `GET /api/match` (added this week): a ranked, cheapest-first fill plan over open listings with a reason for each pick, so a buyer or a future auto-buyer can cover a kWh request. It plans only; the buyer still pays from their wallet. See `docs/ARCHITECTURE.md` section 6.3.
 - `GET /api/forecast`: hourly generation forecast with a confidence band and a suggested price with its reasoning, driven by live irradiance.
 - Certificate Ledger (`/certificates`): every certificate with producer, owner, meter and reading IDs, price paid and Blockscout links. "Verify reading" checks the registry from the browser.
 - Threat model (`docs/THREAT_MODEL.md`), summarized on the About page: fake readings, replay, key theft, sybil wallets, admin risk, and what's demo-only versus mitigated.
@@ -67,6 +68,8 @@ In Lagos, grid supply is unreliable and many homes run diesel generators, while 
 | Polling indexer in a route handler | Event indexer (The Graph, SubQuery or similar) |
 | Manual listing | Auto-listing of forecast surplus at the suggested price; standing buy orders |
 
+Matching and forecasting already run as server route handlers, so standing buy orders and auto-listing extend `/api/match` and `/api/forecast` rather than needing a new system. The full technical design (contracts, roles, EIP-712 flow, indexer, production path) is in [`docs/ARCHITECTURE.md`](ARCHITECTURE.md).
+
 Celo fees are a fraction of a cent, so a 0.5 kWh purchase stays economical.
 
 **Policy fit.** Certificates carry meter ID, reading ID, timestamp and Wh on-chain, giving companies and policymakers an auditable record of local renewable generation that can't be double counted. This supports transparent reporting toward COP 31 goals.
@@ -83,7 +86,7 @@ Rooftop owners list solar surplus backed by a meter-signed reading. A verificati
 
 ### How we built it
 
-Solidity contracts (`ReadingRegistry`, `EnergyMarket`, `RECToken`) on OpenZeppelin 5 with Hardhat 3 and 20 tests, deployed and verified on Celo Sepolia. EIP-712 signed meter readings. A Next.js App Router front end with wagmi and viem, plus server route handlers for the simulated meter, market indexing, forecasting and reading verification. Weather data comes from Open-Meteo.
+Solidity contracts (`ReadingRegistry`, `EnergyMarket`, `RECToken`) on OpenZeppelin 5 with Hardhat 3 and 20 tests, deployed and verified on Celo Sepolia. EIP-712 signed meter readings. A Next.js App Router front end with wagmi and viem, plus server route handlers for the simulated meter, market indexing, forecasting and reading verification. Weather data comes from Open-Meteo. A cheapest-first matching endpoint (`/api/match`) plans fills across open listings. Architecture, role permissions and the double-claim guarantee are documented in `docs/ARCHITECTURE.md`.
 
 ### Challenges we ran into
 
@@ -114,3 +117,4 @@ _Link goes here after recording. Script: `docs/DEMO_SCRIPT.md`._
 - Meter data is simulated: a server-side meter key signs readings. Trades, payments and certificates are real testnet transactions. Labeled in the UI footer and README.
 - CO₂ avoided is an estimate using 0.456 kg CO₂e/kWh (Nigeria grid 2025, Ember via Our World in Data).
 - Forecasts are shown with a confidence band.
+- Verification and matching are transparent rule-based logic, not a trained model.

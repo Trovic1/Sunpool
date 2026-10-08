@@ -14,6 +14,32 @@ IEEE ClimateChain Global Hackathon 2026 · Track: Renewable Energy & Energy Trad
 
 In Lagos, most homes load prepaid units onto their DisCo meter. Those units are locked to that meter number and cannot be resold, and Sunpool never touches them. Sunpool sells **solar surplus**: midday output that a rooftop makes beyond what its home uses. That power travels over a shared line (a compound, an estate or a mini-grid) to the buyer's socket. A small smart meter on that line counts the loaded kWh down like prepaid units and signs each reading. In this demo the meter is simulated.
 
+## Track alignment
+
+**Track: Renewable Energy & Energy Trading.** Sunpool covers four of the track's builds:
+
+- **Peer-to-peer energy trading:** households list rooftop surplus and neighbours buy it in a dollar stablecoin, settled on-chain.
+- **Renewable certificate tracking:** every settled trade mints an ERC-721 certificate carrying meter ID, reading ID, timestamp and Wh; a reading ID can be consumed once, so a kWh batch cannot be certified twice.
+- **Microgrid coordination:** built for the shared line in an estate, compound or mini-grid; one market per neighbourhood can share one reading registry. Forecast, fair-price suggestion and cheapest-first matching help sellers and buyers coordinate.
+- **Tokenized incentives:** sellers are paid instantly in stablecoin, and buyers receive the certificate.
+
+## Architecture
+
+Full write-up: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) (contracts and roles, EIP-712 flow, double-claim guarantee, AI layer, indexer, config, testing, production path).
+
+```mermaid
+flowchart LR
+  UI["Next.js UI + wallet<br/>(wagmi, viem)"] -->|"POST /api/readings"| Meter["Simulated meter<br/>verifies, then signs EIP-712"]
+  UI -->|"/api/forecast, /api/verify, /api/match"| AI["AI layer<br/>forecast, price, checks, matching"]
+  AI --> OM["Open-Meteo irradiance"]
+  UI -->|"list / buy / cancel"| EM["EnergyMarket"]
+  EM -->|"consume once"| RR["ReadingRegistry"]
+  EM -->|"mint"| RT["RECToken (ERC-721)"]
+  EM -->|"pay seller"| TOK["USDC"]
+  Idx["/api/market, /api/certificates<br/>polling indexer"] -->|"logs, multicall"| EM
+  UI --> Idx
+```
+
 ## Deployed contracts (Celo Sepolia, chain ID 11142220)
 
 | Contract | Address |
@@ -64,6 +90,10 @@ Source is verified on Blockscout. Network details live in `src/lib/chain/celo.ts
 | About & impact page (delivery paths, use cases, sourced numbers, production path, security & trust) | Done |
 | AI verification of meter readings (live irradiance bound, on-chain per-seller accounting, anomaly score) + 19 unit tests | Done |
 | `/api/forecast` and `/api/verify` route handlers | Done |
+| `/api/match`: ranked cheapest-first fill plan with reasons (added this week) | Done, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) |
+| Architecture doc | Done |
+| Mobile layout (375px, all pages) | Checked; MiniPay in-app test on a real phone still to do |
+| Demo video | Pending |
 | Threat model ([`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md)) | Done |
 | Certificate Ledger (`/certificates`): every REC with reading consumed in the registry, live verify, explorer links | Done |
 | My Home (`/me`, from the wallet menu): your loaded kWh, sales, open listings with cancel, trades and certificates | Done |
@@ -75,7 +105,9 @@ npm install
 npm run dev        # http://localhost:3000
 ```
 
-Copy `.env.example` to `.env.local`. `METER_SIGNER_PRIVATE_KEY` must be the key registered in `ReadingRegistry` for listing to work.
+Copy `.env.example` to `.env.local`. `METER_SIGNER_PRIVATE_KEY` must be the key registered in `ReadingRegistry` for listing to work; `DEPLOYER_PRIVATE_KEY` is only needed to deploy contracts. Use testnet-only keys. The three `NEXT_PUBLIC_*_ADDRESS` variables are optional: the deployed Celo Sepolia addresses above are built in, and the variables override them after a redeploy.
+
+Note: `.env.example` sets `NEXT_PUBLIC_DATA_SOURCE=seeded`, which runs the offline demo. Set it to `chain` (or delete the line) to read and write Celo Sepolia, which is also the default when the variable is unset.
 
 The offline demo stays available at `/?source=seeded` (or `NEXT_PUBLIC_DATA_SOURCE=seeded`), with URL-driven states for recording:
 
@@ -83,7 +115,7 @@ The offline demo stays available at `/?source=seeded` (or `NEXT_PUBLIC_DATA_SOUR
 - `/?source=seeded&state=empty`: pre-dawn, no trades yet
 - `/?source=seeded&state=error`: trade feed offline, with retry
 
-Checks: `npm run lint`, `npm run typecheck`, `npm run test:unit` (verification and forecast logic, `node:test` via tsx), `npm run contracts:test`, `npm run build`.
+Checks: `npm run lint`, `npm run typecheck`, `npm run test:unit` (19 tests of the reading-verification logic, `node:test` via tsx), `npm run contracts:test` (20 Hardhat tests), `npm run build`.
 
 Contracts: `npm run contracts:test`, `npm run contracts:deploy` (needs `DEPLOYER_PRIVATE_KEY`), `npm run contracts:abis` after any contract change.
 
@@ -108,6 +140,11 @@ Next.js (App Router) · TypeScript · Hardhat 3 + viem · OpenZeppelin 5 · Tail
 
 ## Docs
 
-- [`docs/PRD.md`](docs/PRD.md): design PRD, concept and Deep forest brand; [`DESIGN.md`](DESIGN.md): tokens and components
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md): system diagram, contracts and roles, EIP-712 flow, double-claim guarantee, AI layer, indexer, config, testing, production path
 - [`docs/SUBMISSION.md`](docs/SUBMISSION.md): running Devpost write-up
 - [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md): assets, trust boundaries, threats and mitigations, production path
+- [`docs/PRD.md`](docs/PRD.md): design PRD, concept and Deep forest brand; [`DESIGN.md`](DESIGN.md): tokens and components
+- [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md): demo video script
+- [`docs/RESEARCH.md`](docs/RESEARCH.md): sourced facts on Lagos power costs, regulation, MiniPay and inverter APIs
+- [`docs/HACKATHON_PLAN.md`](docs/HACKATHON_PLAN.md): judging review, use cases and the build list
+- [`docs/DESIGN_DIRECTION.md`](docs/DESIGN_DIRECTION.md): design direction notes

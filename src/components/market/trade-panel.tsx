@@ -4,16 +4,20 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { Check, RotateCw, Sun } from "lucide-react"
 import { parseAsStringLiteral, useQueryState } from "nuqs"
 import { useMemo, useState } from "react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import type { MarketListing, MarketModel } from "@/hooks/market-types"
+import { useMatch } from "@/hooks/use-match"
 import { CURRENCY, formatCusd, formatKwh, formatPrice, partyName } from "@/lib/format"
 import { DEMO_SELLER, houseById } from "@/lib/seed"
 import { cn } from "@/lib/utils"
 
 import { AnimatedNumber } from "./animated-number"
+import { BestMatch } from "./best-match"
 import { ListSurplusForm } from "./list-surplus-dialog"
 import { SunCurve } from "./sun-curve"
 
@@ -69,6 +73,30 @@ function BuyPanel({ market }: { market: MarketModel }) {
   const offers = useMemo(() => market.listings.filter((l) => !isOwn(l, account)), [market.listings, account])
   const [picked, setPicked] = useState<string | null>(null)
   const selected = offers.find((l) => l.id === picked && !l.pending) ?? offers.find((l) => !l.pending)
+  const [need, setNeed] = useState("")
+  const [planIds, setPlanIds] = useState<string[]>([])
+  const wanted = Number(need)
+  const needKwh = need.trim() !== "" && Number.isFinite(wanted) && wanted > 0 ? wanted : null
+  // With no amount typed, rank for the first open offer's size, so a cheaper one still surfaces.
+  const requestKwh = needKwh ?? offers.find((l) => !l.pending)?.kwh ?? null
+  const match = useMatch(
+    status === "ready" ? requestKwh : null,
+    useMemo(() => offers.filter((l) => !l.pending).map((l) => l.id), [offers]),
+  )
+  const plan = match.data
+  // Show it only when it does better than the offer already selected.
+  const worthShowing =
+    !!plan &&
+    plan.status !== "none" &&
+    (plan.picks.length > 1 || (!!selected && plan.picks[0].listingId !== selected.id && plan.picks[0].price < selected.price - 0.0005))
+  const openPlanIds = planIds.filter((id) => offers.some((l) => l.id === id && !l.pending))
+  const planNext = openPlanIds.length ? offers.find((l) => l.id === openPlanIds[0]) : undefined
+  const planApplied = !!plan && openPlanIds.length > 0 && plan.picks.every((p) => planIds.includes(p.listingId))
+  const target = planNext ?? selected
+  const sellerName = (id: string) => {
+    const house = houseById(id)
+    return house?.name ?? partyName(id, {}, account)
+  }
   const available = offers.reduce((sum, l) => sum + l.kwh, 0)
   const cheapest = offers.length ? Math.min(...offers.map((l) => l.price)) : undefined
   const reduced = useReducedMotion()
@@ -115,6 +143,51 @@ function BuyPanel({ market }: { market: MarketModel }) {
 
       <SunCurve points={market.generation.points} label="Today's solar output in the neighbourhood: metered so far, forecast for the rest of the day" />
 
+      {offers.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <label className="flex items-center gap-3 text-sm text-muted-foreground">
+            <span className="shrink-0">I need</span>
+            <Input
+              type="number"
+              inputMode="decimal"
+              min="0"
+              step="0.1"
+              value={need}
+              onChange={(e) => {
+                setNeed(e.target.value)
+                setPlanIds([])
+              }}
+              placeholder="any"
+              aria-label="kWh needed"
+              className="h-10 w-24 bg-background font-mono tabular"
+            />
+            <span className="shrink-0">kWh</span>
+          </label>
+          {(worthShowing || match.isFetching || match.isError) && (
+            <BestMatch
+              plan={worthShowing ? plan : undefined}
+              loading={match.isFetching && !plan}
+              error={match.isError}
+              onRetry={() => void match.refetch()}
+              applied={planApplied}
+              nameOf={sellerName}
+              onApply={() => {
+                if (!plan) return
+                const ids = plan.picks.map((p) => p.listingId)
+                setPlanIds(ids)
+                setPicked(ids[0])
+                toast.success("Best match selected", {
+                  description:
+                    ids.length > 1
+                      ? `${ids.length} offers, ${formatKwh(plan.filledKwh)} kWh for ${formatCusd(plan.totalCost)} ${CURRENCY}. You buy them one at a time.`
+                      : `${formatKwh(plan.filledKwh)} kWh for ${formatCusd(plan.totalCost)} ${CURRENCY}.`,
+                })
+              }}
+            />
+          )}
+        </div>
+      )}
+
       {offers.length === 0 ? (
         <div className="flex flex-col items-start gap-1 rounded-2xl bg-background p-5">
           <p className="font-semibold">No solar for sale right now</p>
@@ -132,16 +205,17 @@ function BuyPanel({ market }: { market: MarketModel }) {
                 exit={{ opacity: 0 }}
                 transition={{ type: "spring", duration: 0.3, bounce: 0 }}
               >
-                <Offer listing={listing} account={account} selected={selected?.id === listing.id} onSelect={() => setPicked(listing.id)} />
+                <Offer listing={listing} account={account} selected={openPlanIds.length ? openPlanIds.includes(listing.id) : selected?.id === listing.id} onSelect={() => { setPlanIds([]); setPicked(listing.id) }} />
               </motion.li>
             ))}
           </AnimatePresence>
         </ul>
       )}
 
-      {selected && (
-        <Button size="lg" className="h-14 w-full rounded-2xl font-display text-lg font-bold" onClick={() => market.buy(selected)}>
-          Load {formatKwh(selected.kwh)} kWh for {formatCusd(selected.kwh * selected.price)} {CURRENCY}
+      {target && (
+        <Button size="lg" className="h-14 w-full rounded-2xl font-display text-lg font-bold" onClick={() => market.buy(target)}>
+          Load {formatKwh(target.kwh)} kWh for {formatCusd(target.kwh * target.price)} {CURRENCY}
+          {openPlanIds.length > 1 ? ` (1 of ${openPlanIds.length})` : ""}
         </Button>
       )}
     </div>
