@@ -46,11 +46,11 @@ Go back to the valid amount and list it. Show the toast and the transaction.
 
 **Screen:** Buyer profile → Market → Buy power → Load.
 
-> "Now I'm the neighbour, a tailor whose generator costs a fortune. I type how much I need, and Sunpool's matcher picks the cheapest set of offers that covers it, and tells me why. One tap: load."
+> "Now I'm the neighbour, a tailor whose generator costs a fortune. Every offer near me is backed by a signed meter reading, including the two kilowatt-hours that were just listed. One tap to load. I approve the payment, and confirm in my wallet."
 
-Approve and confirm. Show pending → settled.
+Approve and confirm. Show pending → settled, then the transaction on Blockscout.
 
-> "USDC goes straight to the rooftop owner, and I receive a renewable energy certificate."
+> "The dollar stablecoin goes straight to the rooftop owner, and I receive a renewable energy certificate. Here's the settled transaction on the Celo block explorer."
 
 **Screen:** `/activity`: the trade appears on the tape and the counters tick up.
 
