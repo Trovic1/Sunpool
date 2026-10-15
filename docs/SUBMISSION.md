@@ -25,6 +25,7 @@ In Lagos, grid supply is unreliable and many homes run diesel generators, while 
 - Live demo: https://sunpool-gamma.vercel.app
 - Activity: https://sunpool-gamma.vercel.app/activity
 - Double-claim proof: https://sunpool-gamma.vercel.app/double-claim
+- Demo video: https://youtu.be/MP11hLcs4bc
 - Contracts (Celo Sepolia, verified on Blockscout): ReadingRegistry `0xdA4575C3C30F5E81E0d57Ed96fd6ba39a2FE8b10`, RECToken `0xC92552b83C094E8052d9b8B4EDba34A3E1bA4ec6`, EnergyMarket (USDC) `0xAd7dF1530410e4eA9a6CAcb0C9C993958Aef0A29`
 
 ## What works today
@@ -110,7 +111,7 @@ A pilot proposal with one Lagos estate or mini-grid operator. Device-signed read
 
 ## Demo video
 
-_Link goes here after recording. Script: `docs/DEMO_SCRIPT.md`._
+https://youtu.be/MP11hLcs4bc (3:48). Script: `docs/DEMO_SCRIPT.md`.
 
 ## Honesty notes
 
