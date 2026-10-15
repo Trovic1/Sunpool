@@ -107,7 +107,7 @@ Most of the trust problem in energy trading sits at the meter, not on the chain.
 
 ### What's next for Sunpool
 
-A pilot proposal with one Lagos estate or mini-grid operator. Device-signed readings through an inverter cloud API, starting with Growatt's published Open API. Mainnet launch inside MiniPay. Auto-listing and standing buy orders.
+Approach one Lagos estate or mini-grid operator about a first pilot. Device-signed readings through an inverter cloud API, starting with Growatt's published Open API. Mainnet launch inside MiniPay. Auto-listing and standing buy orders.
 
 ## Demo video
 
